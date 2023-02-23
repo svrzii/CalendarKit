@@ -453,14 +453,14 @@ public final class TimelinePagerView: UIView, UIGestureRecognizerDelegate, UIScr
       let direction: UIPageViewController.NavigationDirection = leftToRight ? .reverse : .forward
       pagingViewController.setViewControllers([newController],
                                               direction: direction,
-                                              animated: false,
+                                              animated: true,
                                               completion: completionHandler(_:))
     } else if newDate > oldDate {
       let leftToRight = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .leftToRight
       let direction: UIPageViewController.NavigationDirection = leftToRight ? .forward : .reverse
       pagingViewController.setViewControllers([newController],
                                               direction: direction,
-                                              animated: false,
+                                              animated: true,
                                               completion: completionHandler(_:))
     }
   }
