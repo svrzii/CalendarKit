@@ -13,6 +13,7 @@ open class EventView: UIView {
     view.isUserInteractionEnabled = false
     view.backgroundColor = .clear
     view.isScrollEnabled = false
+	view.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     return view
   }()
 
@@ -31,7 +32,9 @@ open class EventView: UIView {
   }
 
   private func configure() {
-    clipsToBounds = false
+    clipsToBounds = true
+    layer.masksToBounds = true
+	layer.cornerRadius = 5
     color = tintColor
     addSubview(textView)
     
@@ -103,7 +106,7 @@ open class EventView: UIView {
     context.interpolationQuality = .none
     context.saveGState()
     context.setStrokeColor(color.cgColor)
-    context.setLineWidth(3)
+    context.setLineWidth(5)
     context.translateBy(x: 0, y: 0.5)
     let leftToRight = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .leftToRight
     let x: CGFloat = leftToRight ? 0 : frame.width - 1  // 1 is the line width
@@ -123,7 +126,7 @@ open class EventView: UIView {
         if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
             return CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width - 3, height: bounds.height)
         } else {
-            return CGRect(x: bounds.minX + 3, y: bounds.minY, width: bounds.width - 3, height: bounds.height)
+			return CGRect(x: bounds.minX + 2.5, y: bounds.height > 20 ? bounds.minY + 5 : bounds.minY, width: bounds.width - 3, height: bounds.height)
         }
     }()
     if frame.minY < 0 {
