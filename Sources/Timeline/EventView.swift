@@ -126,7 +126,7 @@ open class EventView: UIView {
         if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
             return CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width - 3, height: bounds.height)
         } else {
-			return CGRect(x: bounds.minX + 2.5, y: bounds.height > 20 ? bounds.minY + 5 : bounds.minY, width: bounds.width - 3, height: bounds.height)
+			return CGRect(x: bounds.minX + 2.5, y: bounds.height >= 24 ? bounds.minY + 5 : bounds.minY + 1, width: bounds.width - 3, height: bounds.height)
         }
     }()
     if frame.minY < 0 {
