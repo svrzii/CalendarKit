@@ -406,10 +406,10 @@ public final class TimelineView: UIView {
 			x = attributes.frame.minX
 		}
 		
-		eventView.frame = CGRect(x: x > 53 ? x - abs(style.eventGap) : x,
+		eventView.frame = CGRect(x: x > 65 ? x - abs(style.eventGap) : x,
 								 y: attributes.frame.minY,
-								 width: x < 54 ? (attributes.frame.width) : attributes.frame.width + abs(style.eventGap),
-								 height: max(25, attributes.frame.height))
+								 width: x > 65 ? attributes.frame.width + abs(style.eventGap) : (attributes.frame.width),
+								 height: max(24, attributes.frame.height))
 		eventView.updateWithDescriptor(event: descriptor)
 	}
   }

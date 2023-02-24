@@ -17,7 +17,14 @@ open class EventView: UIView {
     return view
   }()
 	
-	public private(set) lazy var backgroundView: UIView = {
+	public private(set) lazy var cardView: UIView = {
+		let view = UIView()
+		view.isUserInteractionEnabled = false
+		view.backgroundColor = .white
+		return view
+	}()
+	
+	public private(set) lazy var colorView: UIView = {
 		let view = UIView()
 		view.isUserInteractionEnabled = false
 		view.backgroundColor = .white
@@ -39,15 +46,25 @@ open class EventView: UIView {
   }
 
   private func configure() {
-    clipsToBounds = true
-    layer.masksToBounds = true
 	layer.cornerRadius = 5
     color = tintColor
 	  
-	backgroundView.frame = bounds
-	insertSubview(backgroundView, at: 0)
+	cardView.frame = CGRect(x: 0, y: 2, width: bounds.width, height: bounds.height - 2)
+	colorView.frame = bounds
+	colorView.layer.cornerRadius = 5
+	colorView.clipsToBounds = true
+	insertSubview(colorView, at: 0)
 
-    addSubview(textView)
+	cardView.layer.cornerRadius = 4
+	insertSubview(cardView, at: 1)
+	  
+    colorView.layer.shadowColor = UIColor.black.cgColor
+    colorView.layer.shadowOffset = CGSize(width: 0.0, height: 0.5)
+    colorView.layer.shadowRadius = 5
+    colorView.layer.shadowOpacity = 0.5
+    colorView.layer.masksToBounds = false
+	  
+	addSubview(textView)
     
     for (idx, handle) in eventResizeHandles.enumerated() {
       handle.tag = idx
@@ -60,18 +77,19 @@ open class EventView: UIView {
       textView.attributedText = attributedText
     } else {
       textView.text = event.text
-      textView.textColor = event.textColor
+	textView.textColor = .black
       textView.font = event.font
     }
     if let lineBreakMode = event.lineBreakMode {
       textView.textContainer.lineBreakMode = lineBreakMode
     }
     descriptor = event
-	backgroundView.backgroundColor = event.backgroundColor
-	backgroundColor = .white
+	cardView.backgroundColor = UIColor.white.withAlphaComponent(0.95)
+	colorView.backgroundColor = event.backgroundColor
+	backgroundColor = UIColor.clear
     color = event.color
     eventResizeHandles.forEach{
-      $0.borderColor = event.color
+      $0.borderColor =  event.color
       $0.isHidden = event.editedEvent == nil
     }
     drawsShadow = event.editedEvent != nil
@@ -110,37 +128,19 @@ open class EventView: UIView {
     return super.hitTest(point, with: event)
   }
 
-  override open func draw(_ rect: CGRect) {
-    super.draw(rect)
-    guard let context = UIGraphicsGetCurrentContext() else {
-      return
-    }
-    context.interpolationQuality = .none
-    context.saveGState()
-    context.setStrokeColor(color.cgColor)
-    context.setLineWidth(5)
-    context.translateBy(x: 0, y: 0.5)
-    let leftToRight = UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .leftToRight
-    let x: CGFloat = leftToRight ? 0 : frame.width - 1  // 1 is the line width
-    let y: CGFloat = 0
-    context.beginPath()
-    context.move(to: CGPoint(x: x, y: y))
-    context.addLine(to: CGPoint(x: x, y: (bounds).height))
-    context.strokePath()
-    context.restoreGState()
-  }
-
   private var drawsShadow = false
 
   override open func layoutSubviews() {
     super.layoutSubviews()
-	backgroundView.frame = bounds
-
+	cardView.frame = CGRect(x: 0, y: 2, width: bounds.width, height: bounds.height - 2)
+	colorView.frame = bounds
     textView.frame = {
         if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
             return CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width - 3, height: bounds.height)
         } else {
-			return CGRect(x: bounds.minX + 2.5, y: bounds.height >= 24 ? bounds.minY + 5 : bounds.minY + 1, width: bounds.width - 3, height: bounds.height)
+			let textViewY = bounds.height >= 24 ? bounds.minY + 5 : bounds.minY + 1
+			
+			return CGRect(x: bounds.minX + 2.5, y: textViewY, width: bounds.width - 5, height: bounds.height - textViewY * 2)
         }
     }()
     if frame.minY < 0 {
