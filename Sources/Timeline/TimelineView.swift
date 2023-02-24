@@ -392,26 +392,26 @@ public final class TimelineView: UIView {
   }
 
   private func layoutEvents() {
-    if eventViews.isEmpty { return }
-    
-    for (idx, attributes) in regularLayoutAttributes.enumerated() {
-      let descriptor = attributes.descriptor
-      let eventView = eventViews[idx]
-      eventView.frame = attributes.frame
-        
-      var x: CGFloat
-      if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
-        x = bounds.width - attributes.frame.minX - attributes.frame.width
-      } else {
-        x = attributes.frame.minX
-      }
-        
-      eventView.frame = CGRect(x: x,
-                               y: attributes.frame.minY,
-                               width: attributes.frame.width - style.eventGap,
-                               height: attributes.frame.height - style.eventGap)
-      eventView.updateWithDescriptor(event: descriptor)
-    }
+	if eventViews.isEmpty { return }
+	
+	for (idx, attributes) in regularLayoutAttributes.enumerated() {
+		let descriptor = attributes.descriptor
+		let eventView = eventViews[idx]
+		eventView.frame = attributes.frame
+		
+		var x: CGFloat
+		if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
+			x = bounds.width - attributes.frame.minX - attributes.frame.width
+		} else {
+			x = attributes.frame.minX
+		}
+		
+		eventView.frame = CGRect(x: x > 53 ? x - abs(style.eventGap) : x,
+								 y: attributes.frame.minY,
+								 width: x < 54 ? (attributes.frame.width) : attributes.frame.width + abs(style.eventGap),
+								 height: max(25, attributes.frame.height))
+		eventView.updateWithDescriptor(event: descriptor)
+	}
   }
   
   private func layoutAllDayEvents() {

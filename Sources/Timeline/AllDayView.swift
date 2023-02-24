@@ -120,7 +120,7 @@ public final class AllDayView: UIView {
     scrollView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
     bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: 2).isActive = true
     
-    let maxAllDayViewHeight = allDayEventHeight * 5 + allDayEventHeight * 0.5
+    let maxAllDayViewHeight = allDayEventHeight * 3 + allDayEventHeight * 0.5
     heightAnchor.constraint(lessThanOrEqualToConstant: maxAllDayViewHeight).isActive = true
     
     updateStyle(style)

@@ -16,6 +16,13 @@ open class EventView: UIView {
 	view.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     return view
   }()
+	
+	public private(set) lazy var backgroundView: UIView = {
+		let view = UIView()
+		view.isUserInteractionEnabled = false
+		view.backgroundColor = .white
+		return view
+	}()
 
   /// Resize Handle views showing up when editing the event.
   /// The top handle has a tag of `0` and the bottom has a tag of `1`
@@ -36,6 +43,10 @@ open class EventView: UIView {
     layer.masksToBounds = true
 	layer.cornerRadius = 5
     color = tintColor
+	  
+	backgroundView.frame = bounds
+	insertSubview(backgroundView, at: 0)
+
     addSubview(textView)
     
     for (idx, handle) in eventResizeHandles.enumerated() {
@@ -56,7 +67,8 @@ open class EventView: UIView {
       textView.textContainer.lineBreakMode = lineBreakMode
     }
     descriptor = event
-    backgroundColor = event.backgroundColor
+	backgroundView.backgroundColor = event.backgroundColor
+	backgroundColor = .white
     color = event.color
     eventResizeHandles.forEach{
       $0.borderColor = event.color
@@ -122,6 +134,8 @@ open class EventView: UIView {
 
   override open func layoutSubviews() {
     super.layoutSubviews()
+	backgroundView.frame = bounds
+
     textView.frame = {
         if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
             return CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width - 3, height: bounds.height)
