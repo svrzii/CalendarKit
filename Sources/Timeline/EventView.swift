@@ -132,7 +132,7 @@ open class EventView: UIView {
 
   override open func layoutSubviews() {
     super.layoutSubviews()
-	cardView.frame = CGRect(x: 0, y: 2, width: bounds.width, height: bounds.height - 2)
+	cardView.frame = CGRect(x: 0, y: 3, width: bounds.width, height: bounds.height - 3)
 	colorView.frame = bounds
     textView.frame = {
         if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
@@ -140,7 +140,7 @@ open class EventView: UIView {
         } else {
 			let textViewY = bounds.height >= 24 ? bounds.minY + 5 : bounds.minY + 1
 			
-			return CGRect(x: bounds.minX + 2.5, y: textViewY, width: bounds.width - 5, height: bounds.height - textViewY * 2)
+			return CGRect(x: bounds.minX, y: textViewY, width: bounds.width, height: bounds.height - textViewY * 2)
         }
     }()
     if frame.minY < 0 {
