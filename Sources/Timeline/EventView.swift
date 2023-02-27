@@ -86,7 +86,8 @@ open class EventView: UIView {
     descriptor = event
 	cardView.backgroundColor = event.cardBackgroundColor.withAlphaComponent(0.95)
 	colorView.backgroundColor = event.backgroundColor
-	colorView.layer.shadowColor = event.backgroundColor.cgColor
+	colorView.layer.shadowColor = event.shadowColor.cgColor
+
 	backgroundColor = .clear
     color = event.color
     eventResizeHandles.forEach{

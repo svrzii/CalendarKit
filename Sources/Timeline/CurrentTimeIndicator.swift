@@ -148,7 +148,8 @@ import UIKit
     timeLabel.font = style.font
     circle.backgroundColor = style.color
     line.backgroundColor = style.color
-    
+	timeLabel.backgroundColor = style.backgroundColor
+	timeLabel.layer.shadowColor = style.backgroundColor.cgColor
     switch style.dateStyle {
     case .twelveHour:
         is24hClock = false
