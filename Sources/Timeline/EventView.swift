@@ -84,9 +84,10 @@ open class EventView: UIView {
       textView.textContainer.lineBreakMode = lineBreakMode
     }
     descriptor = event
-	cardView.backgroundColor = UIColor.white.withAlphaComponent(0.95)
+	cardView.backgroundColor = event.cardBackgroundColor.withAlphaComponent(0.95)
 	colorView.backgroundColor = event.backgroundColor
-	backgroundColor = UIColor.clear
+	colorView.layer.shadowColor = event.backgroundColor.cgColor
+	backgroundColor = .clear
     color = event.color
     eventResizeHandles.forEach{
       $0.borderColor =  event.color

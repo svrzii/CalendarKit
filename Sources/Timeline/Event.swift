@@ -1,6 +1,8 @@
 import UIKit
 
 public final class Event: EventDescriptor {
+  public var shadowColor: UIColor = .black
+  public var cardBackgroundColor: UIColor = .white
   public var dateInterval = DateInterval()
   public var isAllDay = false
   public var text = ""
