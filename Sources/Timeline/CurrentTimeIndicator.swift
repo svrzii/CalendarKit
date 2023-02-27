@@ -61,13 +61,6 @@ import UIKit
     timeLabel.textAlignment = .right
     timeLabel.adjustsFontSizeToFitWidth = true
     timeLabel.minimumScaleFactor = 0.5
-	timeLabel.backgroundColor = style.backgroundColor
-	timeLabel.layer.cornerRadius = 5
-	timeLabel.layer.shadowColor = style.backgroundColor.cgColor
-	timeLabel.layer.shadowOffset = CGSize(width: 0.0, height: 0.5)
-	timeLabel.layer.shadowRadius = 5
-	timeLabel.layer.shadowOpacity = 1
-	timeLabel.layer.masksToBounds = false
     
     //The width of the label is determined by leftInset and padding. 
     //The y position is determined by the line's middle.
@@ -148,8 +141,7 @@ import UIKit
     timeLabel.font = style.font
     circle.backgroundColor = style.color
     line.backgroundColor = style.color
-	timeLabel.backgroundColor = style.backgroundColor
-	timeLabel.layer.shadowColor = style.backgroundColor.cgColor
+    
     switch style.dateStyle {
     case .twelveHour:
         is24hClock = false

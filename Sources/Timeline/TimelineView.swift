@@ -271,6 +271,16 @@ public final class TimelineView: UIView {
 			accentedHour = eventEditingSnappingBehavior.accentedHour(for: accentedDate)
 			accentedMinute = eventEditingSnappingBehavior.accentedMinute(for: accentedDate)
 		}
+		
+		if isToday {
+			let minute = component(component: .minute, from: currentTime)
+			let hour = component(component: .hour, from: currentTime)
+			if minute > 39 {
+				hourToRemoveIndex = hour + 1
+			} else if minute < 21 {
+				hourToRemoveIndex = hour
+			}
+		}
 	
 		let mutableParagraphStyle = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
 		mutableParagraphStyle.lineBreakMode = .byWordWrapping
