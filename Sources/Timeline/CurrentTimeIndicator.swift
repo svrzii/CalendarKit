@@ -98,7 +98,7 @@ import UIKit
   private func updateDate() {
     dateFormatter.dateFormat = is24hClock ? "HH:mm" : "h:mm a"
     dateFormatter.calendar = calendar
-    dateFormatter.timeZone = calendar.timeZone
+	dateFormatter.timeZone = TimeZone.current
     timeLabel.text = dateFormatter.string(from: date)
     timeLabel.sizeToFit()
     setNeedsLayout()
