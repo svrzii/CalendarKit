@@ -44,6 +44,7 @@ public final class TimelineView: UIView {
 			allDayLayoutAttributes.removeAll()
 			regularLayoutAttributes.removeAll()
 			sortedEvents.removeAll()
+			numberOfRecalculations = 0
 			for anEventLayoutAttribute in newValue {
 				let eventDescriptor = anEventLayoutAttribute.descriptor
 				if eventDescriptor.isAllDay {
@@ -389,15 +390,16 @@ public final class TimelineView: UIView {
 	// MARK: - Layout
 	
 	var timer = Timer()
-	
+	var numberOfRecalculations = 0
 	override public func layoutSubviews() {
 		super.layoutSubviews()
-		if self.allowRecalculation {
+		if self.numberOfRecalculations < 5 || self.allowRecalculation {
 			recalculateEventLayout()
 			layoutEvents()
 			layoutNowLine()
 			layoutAllDayEvents()
 			self.allowRecalculation = false
+			self.numberOfRecalculations += 1
 		}
 	}
 	
