@@ -31,6 +31,7 @@ public final class TimelineView: UIView {
 		let day = DateInterval(start: date, end: end)
 		let validEvents = events.filter{$0.dateInterval.intersects(day)}
 		layoutAttributes = validEvents.map(EventLayoutAttributes.init)
+		setNeedsDisplay()
 	}
 	
 	public var layoutAttributes: [EventLayoutAttributes] {
@@ -42,6 +43,7 @@ public final class TimelineView: UIView {
 			// update layout attributes by separating all-day from non-all-day events
 			allDayLayoutAttributes.removeAll()
 			regularLayoutAttributes.removeAll()
+			sortedEvents.removeAll()
 			for anEventLayoutAttribute in newValue {
 				let eventDescriptor = anEventLayoutAttribute.descriptor
 				if eventDescriptor.isAllDay {
@@ -111,6 +113,7 @@ public final class TimelineView: UIView {
 	
 	public var calendar: Calendar = Calendar.autoupdatingCurrent {
 		didSet {
+			calendar.timeZone = TimeZone(abbreviation: "UTC")!
 			eventEditingSnappingBehavior.calendar = calendar
 			nowLine.calendar = calendar
 			regenerateTimeStrings()
@@ -175,8 +178,15 @@ public final class TimelineView: UIView {
 		// Add long press gesture recognizer
 		addGestureRecognizer(longPressGestureRecognizer)
 		addGestureRecognizer(tapGestureRecognizer)
+		
+		// Scheduling timer to Call the function "updateCounting" with the interval of 1 seconds
+		timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateCounting), userInfo: nil, repeats: true)
 	}
 	
+	var allowRecalculation = false
+	@objc func updateCounting(){
+		self.allowRecalculation = true
+	}
 	// MARK: - Event Handling
 	
 	@objc private func longPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
@@ -281,7 +291,7 @@ public final class TimelineView: UIView {
 				hourToRemoveIndex = hour
 			}
 		}
-	
+		
 		let mutableParagraphStyle = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
 		mutableParagraphStyle.lineBreakMode = .byWordWrapping
 		mutableParagraphStyle.alignment = .right
@@ -378,12 +388,17 @@ public final class TimelineView: UIView {
 	
 	// MARK: - Layout
 	
+	var timer = Timer()
+	
 	override public func layoutSubviews() {
 		super.layoutSubviews()
-		recalculateEventLayout()
-		layoutEvents()
-		layoutNowLine()
-		layoutAllDayEvents()
+		if self.allowRecalculation {
+			recalculateEventLayout()
+			layoutEvents()
+			layoutNowLine()
+			layoutAllDayEvents()
+			self.allowRecalculation = false
+		}
 	}
 	
 	private func layoutNowLine() {
@@ -478,13 +493,15 @@ public final class TimelineView: UIView {
 		}
 	}
 	
+	var sortedEvents = [EventLayoutAttributes]()
 	private func recalculateEventLayout() {
-		
 		// only non allDay events need their frames to be set
-		let sortedEvents = self.regularLayoutAttributes.sorted { (attr1, attr2) -> Bool in
-			let start1 = attr1.descriptor.dateInterval.start
-			let start2 = attr2.descriptor.dateInterval.start
-			return start1 < start2
+		if self.sortedEvents.isEmpty {
+			self.sortedEvents = self.regularLayoutAttributes.sorted { (attr1, attr2) -> Bool in
+				let start1 = attr1.descriptor.dateInterval.start
+				let start2 = attr2.descriptor.dateInterval.start
+				return start1 < start2
+			}
 		}
 		
 		var groupsOfEvents = [[EventLayoutAttributes]]()
@@ -503,8 +520,7 @@ public final class TimelineView: UIView {
 				let period2 = period.end.timeIntervalSince(period.start)
 				
 				return period1 > period2
-			}
-				.first!
+			}.first!
 			
 			if style.eventsWillOverlap {
 				guard let earliestEvent = overlappingEvents.first?.descriptor.dateInterval.start else { continue }
@@ -575,6 +591,7 @@ public final class TimelineView: UIView {
 		let fullTimelineHeight = 24 * style.verticalDiff
 		let hour = component(component: .hour, from: date)
 		let minute = component(component: .minute, from: date)
+		
 		let hourY = CGFloat(hour) * style.verticalDiff + style.verticalInset
 		let minuteY = CGFloat(minute) * style.verticalDiff / 60
 		return hourY + minuteY + fullTimelineHeight * dayOffset
