@@ -17,7 +17,20 @@ public final class TimelineView: UIView {
 	}
 	
 	private var currentTime: Date {
-		Date()
+		var cal = Calendar(identifier: Calendar.Identifier.gregorian)
+		
+		guard let utcTimeZone = TimeZone(abbreviation: "UTC") else {
+			return Date()
+		}
+		
+		cal.timeZone = utcTimeZone
+		
+		let hoursFromUTCTime = TimeZone.current.secondsFromGMT() / 60 / 60
+		guard let date = cal.date(byAdding: .hour, value: hoursFromUTCTime, to: Date()) else {
+			return Date()
+		}
+		
+		return date
 	}
 	
 	public var offset: CGFloat = 0
