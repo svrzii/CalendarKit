@@ -236,7 +236,7 @@ public final class TimelineView: UIView {
 			guard let eventInterval = $0.descriptor?.dateInterval else {
 				return false
 			}
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period < 0.34
 		}
 		
@@ -245,8 +245,8 @@ public final class TimelineView: UIView {
 				return false
 			}
 			
-			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.15
-			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.15
+			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.33
+			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.33
 			return first > second
 		})
 		
@@ -254,7 +254,7 @@ public final class TimelineView: UIView {
 			guard let eventInterval = $0.descriptor?.dateInterval else {
 				return false
 			}
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period >= 0.34 && period < 2
 		}
 		
@@ -263,8 +263,8 @@ public final class TimelineView: UIView {
 				return false
 			}
 			
-			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.15
-			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.15
+			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.33
+			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.33
 			return first > second
 		})
 		
@@ -272,7 +272,7 @@ public final class TimelineView: UIView {
 			guard let eventInterval = $0.descriptor?.dateInterval else {
 				return false
 			}
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period >= 2 && period < 4
 		}
 		
@@ -281,8 +281,8 @@ public final class TimelineView: UIView {
 				return false
 			}
 			
-			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.15
-			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.15
+			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.33
+			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.33
 			return first > second
 		})
 		
@@ -290,7 +290,7 @@ public final class TimelineView: UIView {
 			guard let eventInterval = $0.descriptor?.dateInterval else {
 				return false
 			}
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period >= 2 && period < 4
 		}
 		
@@ -299,8 +299,8 @@ public final class TimelineView: UIView {
 				return false
 			}
 			
-			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.15
-			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.15
+			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.33
+			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.33
 			return first > second
 		})
 		
@@ -587,7 +587,7 @@ public final class TimelineView: UIView {
 			guard let eventInterval = $0.descriptor?.dateInterval else {
 				return false
 			}
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period < 0.34
 		}
 		
@@ -596,8 +596,8 @@ public final class TimelineView: UIView {
 				return false
 			}
 			
-			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.15
-			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.15
+			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.33
+			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.33
 			return first > second
 		})
 		
@@ -605,7 +605,7 @@ public final class TimelineView: UIView {
 			guard let eventInterval = $0.descriptor?.dateInterval else {
 				return false
 			}
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period >= 0.34 && period < 2
 		}
 		
@@ -614,8 +614,8 @@ public final class TimelineView: UIView {
 				return false
 			}
 			
-			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.15
-			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.15
+			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.33
+			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.33
 			return first > second
 		})
 		
@@ -623,7 +623,7 @@ public final class TimelineView: UIView {
 			guard let eventInterval = $0.descriptor?.dateInterval else {
 				return false
 			}
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period >= 2 && period < 4
 		}
 		
@@ -632,8 +632,8 @@ public final class TimelineView: UIView {
 				return false
 			}
 			
-			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.15
-			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.15
+			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.33
+			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.33
 			return first > second
 		})
 		
@@ -641,7 +641,7 @@ public final class TimelineView: UIView {
 			guard let eventInterval = $0.descriptor?.dateInterval else {
 				return false
 			}
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period >= 2 && period < 4
 		}
 		
@@ -650,8 +650,8 @@ public final class TimelineView: UIView {
 				return false
 			}
 			
-			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.15
-			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.15
+			let first = hoursBetweenDates(eventInterval0.start, eventInterval0.end) ?? 0.33
+			let second = hoursBetweenDates(eventInterval1.start, eventInterval1.end) ?? 0.33
 			return first > second
 		})
 		
@@ -708,25 +708,25 @@ public final class TimelineView: UIView {
 		
 		self.miniEvents = self.sortedEvents.filter {
 			let eventInterval = $0.descriptor.dateInterval
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period < 0.34
 		}
 		
 		self.smallEvents = self.sortedEvents.filter {
 			let eventInterval = $0.descriptor.dateInterval
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period >= 0.34 && period < 2
 		}
 		
 		self.mediumEvents = self.sortedEvents.filter {
 			let eventInterval = $0.descriptor.dateInterval
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period >= 2 && period < 4
 		}
 		
 		self.bigEvents = self.sortedEvents.filter {
 			let eventInterval = $0.descriptor.dateInterval
-			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0
+			let period = hoursBetweenDates(eventInterval.start, eventInterval.end) ?? 0.33
 			return period >= 4
 		}
 		
@@ -764,7 +764,8 @@ public final class TimelineView: UIView {
 			var isSame = false
 			
 			for overlappingEvent in overlappingEvents {
-				if overlappingEvent.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) && overlappingEvent.descriptor.dateInterval.contains(event.descriptor.dateInterval.end) {
+				if overlappingEvent.descriptor.dateInterval.intersects(event.descriptor.dateInterval) {
+					//if overlappingEvent.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) && overlappingEvent.descriptor.dateInterval.contains(event.descriptor.dateInterval.end) {
 					isSame = true
 				}
 			}
@@ -789,8 +790,8 @@ public final class TimelineView: UIView {
 		
 		for (i, groupsOfEvent) in groupsOfEvents.enumerated() {
 			let newGroupsOfEvent = groupsOfEvent.sorted(by: {
-				let first = hoursBetweenDates($0.descriptor.dateInterval.start, $0.descriptor.dateInterval.end) ?? 0.15
-				let second = hoursBetweenDates($1.descriptor.dateInterval.start, $1.descriptor.dateInterval.end) ?? 0.15
+				let first = hoursBetweenDates($0.descriptor.dateInterval.start, $0.descriptor.dateInterval.end) ?? 0.33
+				let second = hoursBetweenDates($1.descriptor.dateInterval.start, $1.descriptor.dateInterval.end) ?? 0.33
 				return first > second
 			})
 			
@@ -800,75 +801,77 @@ public final class TimelineView: UIView {
 		for overlappingEvents in groupsOfEvents {
 			
 			let totalCount = CGFloat(overlappingEvents.count)
+			var space: CGFloat = 0
+			
 			for (index, event) in overlappingEvents.enumerated() {
 				let startY = dateToY(event.descriptor.dateInterval.start)
 				let endY = dateToY(event.descriptor.dateInterval.end)
 				let floatIndex = CGFloat(index)
 				
-				var space: CGFloat = 0
-				
-				switch type {
-				case 1:
-					for (i, be) in self.bigEvents.enumerated() {
-						if (i == 0 && be.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
-							|| be.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							space = 75
-							break
+				if index == 0 {
+					switch type {
+					case 1:
+						for (i, be) in self.bigEvents.enumerated() {
+							if (i == 0 && be.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
+								|| be.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
+								space = calendarWidth * 0.3
+								break
+							}
 						}
-					}
-				case 2:
-					var bigSpace: CGFloat = 0
-					var mediumSpace: CGFloat = 0
-					
-					for (i, be) in self.bigEvents.enumerated() {
-						if (i == 0 && be.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
-							|| be.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							bigSpace = 75
-							break
+					case 2:
+						var bigSpace: CGFloat = 0
+						var mediumSpace: CGFloat = 0
+						
+						for (i, be) in self.bigEvents.enumerated() {
+							if (i == 0 && be.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
+								|| be.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
+								bigSpace = calendarWidth * 0.3
+								break
+							}
 						}
-					}
-					
-					for (i, me) in self.mediumEvents.enumerated() {
-						if (i == 0 && me.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
-							|| me.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							mediumSpace = 75
-							break
+						
+						for (i, me) in self.mediumEvents.enumerated() {
+							if (i == 0 && me.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
+								|| me.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
+								mediumSpace = calendarWidth * 0.3
+								break
+							}
 						}
-					}
-					
-					space = bigSpace + mediumSpace
-				case 3:
-					var bigSpace: CGFloat = 0
-					var mediumSpace: CGFloat = 0
-					var smallSpace: CGFloat = 0
-					
-					for (i, be) in self.bigEvents.enumerated() {
-						if (i == 0 && be.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
-							|| be.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							bigSpace = 75
-							break
+						
+						space = bigSpace + mediumSpace
+					case 3:
+						var bigSpace: CGFloat = 0
+						var mediumSpace: CGFloat = 0
+						var smallSpace: CGFloat = 0
+						
+						for (i, be) in self.bigEvents.enumerated() {
+							if (i == 0 && be.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
+								|| be.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
+								bigSpace = calendarWidth * 0.3
+								break
+							}
 						}
-					}
-					
-					for (i, me) in self.mediumEvents.enumerated() {
-						if (i == 0 && me.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
-							|| me.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							mediumSpace = 75
-							break
+						
+						for (i, me) in self.mediumEvents.enumerated() {
+							if (i == 0 && me.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
+								|| me.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
+								mediumSpace = calendarWidth * 0.3
+								break
+							}
 						}
-					}
-					
-					for (i, se) in self.smallEvents.enumerated() {
-						if (i == 0 && se.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
-							|| se.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							smallSpace = 75
-							break
+						
+						for (i, se) in self.smallEvents.enumerated() {
+							if (i == 0 && se.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
+								|| se.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
+								smallSpace = calendarWidth * 0.3
+								break
+							}
 						}
+						
+						space = bigSpace + mediumSpace + smallSpace
+					default: break
+						
 					}
-					
-					space = bigSpace + mediumSpace + smallSpace
-				default: break
-					
 				}
 				
 				let fullWidth = calendarWidth - (space)
