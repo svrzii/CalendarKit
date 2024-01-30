@@ -807,7 +807,8 @@ public final class TimelineView: UIView {
 				
 				var space: CGFloat = 0
 				
-				if type == 1 {
+				switch type {
+				case 1:
 					for (i, be) in self.bigEvents.enumerated() {
 						if (i == 0 && be.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
 							|| be.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
@@ -815,13 +816,14 @@ public final class TimelineView: UIView {
 							break
 						}
 					}
-				}
-				
-				if type == 2 {
+				case 2:
+					var bigSpace: CGFloat = 0
+					var mediumSpace: CGFloat = 0
+					
 					for (i, be) in self.bigEvents.enumerated() {
 						if (i == 0 && be.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
 							|| be.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							space = 75
+							bigSpace = 75
 							break
 						}
 					}
@@ -829,17 +831,21 @@ public final class TimelineView: UIView {
 					for (i, me) in self.mediumEvents.enumerated() {
 						if (i == 0 && me.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
 							|| me.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							space = 75
+							mediumSpace = 75
 							break
 						}
 					}
-				}
-				
-				if type == 3 {
+					
+					space = bigSpace + mediumSpace
+				case 3:
+					var bigSpace: CGFloat = 0
+					var mediumSpace: CGFloat = 0
+					var smallSpace: CGFloat = 0
+					
 					for (i, be) in self.bigEvents.enumerated() {
 						if (i == 0 && be.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
 							|| be.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							space = 75
+							bigSpace = 75
 							break
 						}
 					}
@@ -847,7 +853,7 @@ public final class TimelineView: UIView {
 					for (i, me) in self.mediumEvents.enumerated() {
 						if (i == 0 && me.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
 							|| me.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							space = 75
+							mediumSpace = 75
 							break
 						}
 					}
@@ -855,10 +861,14 @@ public final class TimelineView: UIView {
 					for (i, se) in self.smallEvents.enumerated() {
 						if (i == 0 && se.descriptor.dateInterval.intersects(event.descriptor.dateInterval))
 							|| se.descriptor.dateInterval.contains(event.descriptor.dateInterval.start) {
-							space = 75
+							smallSpace = 75
 							break
 						}
 					}
+					
+					space = bigSpace + mediumSpace + smallSpace
+				default: break
+					
 				}
 				
 				let fullWidth = calendarWidth - (space)
