@@ -551,7 +551,7 @@ public final class TimelineView: UIView {
 	func setupColumns(events: [EventLayoutAttributes]) {
 		self.eventColums.removeAll()
 		for event in events {
-			let position = self.findIntersactions(newEvent: event)
+			let position = self.findIntersections(newEvent: event)
 			if self.eventColums.indices.contains(position) {
 				self.eventColums[position].append(event)
 			} else {
@@ -560,7 +560,7 @@ public final class TimelineView: UIView {
 		}
 		
 		for event in events {
-			self.findIntersactionIndexes(newEvent: event)
+			self.findIntersectionIndexes(newEvent: event)
 		}
 		
 		self.regularLayoutAttributes.removeAll()
@@ -569,8 +569,8 @@ public final class TimelineView: UIView {
 			for event in column {
 				let startY = dateToY(event.descriptor.dateInterval.start)
 				let endY = dateToY(event.descriptor.dateInterval.end)
-				let x =  style.leadingInset + CGFloat(i) / CGFloat(event.intersactions.count) * calendarWidth
-				let equalWidth = calendarWidth / CGFloat(event.intersactions.count)
+				let x =  style.leadingInset + CGFloat(i) / CGFloat(event.intersections.count) * calendarWidth
+				let equalWidth = calendarWidth / CGFloat(event.intersections.count)
 				event.frame = CGRect(x: x, y: startY, width: equalWidth, height: endY - startY)
 			}
 			
@@ -578,7 +578,7 @@ public final class TimelineView: UIView {
 		}
 	}
 	
-	func findIntersactions(newEvent: EventLayoutAttributes) -> Int {
+	func findIntersections(newEvent: EventLayoutAttributes) -> Int {
 		var nextSection = 0
 		for (section, eventArray) in self.eventColums.enumerated() {
 			var hasIntersection = false
@@ -597,16 +597,16 @@ public final class TimelineView: UIView {
 		return nextSection
 	}
 	
-	func findIntersactionIndexes(newEvent: EventLayoutAttributes) {
+	func findIntersectionIndexes(newEvent: EventLayoutAttributes) {
 		for (section, eventArray) in self.eventColums.enumerated() {
 			for event in eventArray {
 				if newEvent.descriptor.dateInterval.intersects(with: event.descriptor.dateInterval) {
-					if !event.intersactions.contains(section) {
-						event.intersactions.append(section)
+					if !event.intersections.contains(section) {
+						event.intersections.append(section)
 					}
 					
-					if !newEvent.intersactions.contains(section) {
-						newEvent.intersactions.append(section)
+					if !newEvent.intersections.contains(section) {
+						newEvent.intersections.append(section)
 					}
 				}
 			}
@@ -615,15 +615,6 @@ public final class TimelineView: UIView {
 	
 	func intervalsIntersect(_ interval1: DateInterval, _ interval2: DateInterval) -> Bool {
 		return interval1.end > interval2.start && interval1.start < interval2.end
-	}
-	
-	func hoursBetweenDates(_ startDate: Date, _ endDate: Date?) -> Double? {
-		guard let endDate = endDate else {
-			return nil
-		}
-		let timeInterval = endDate.timeIntervalSince(startDate)
-		let hours = timeInterval / 3600.0 // 1 hour = 3600 seconds
-		return hours
 	}
 	
 	private func prepareEventViews() {
