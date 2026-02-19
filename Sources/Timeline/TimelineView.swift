@@ -25,8 +25,8 @@ public final class TimelineView: UIView {
 		
 		cal.timeZone = utcTimeZone
 		
-		let hoursFromUTCTime = TimeZone.current.secondsFromGMT() / 60 / 60
-		guard let date = cal.date(byAdding: .hour, value: hoursFromUTCTime, to: Date()) else {
+		let secondsFromUTC = displayTimeZone.secondsFromGMT(for: Date())
+		guard let date = cal.date(byAdding: .second, value: secondsFromUTC, to: Date()) else {
 			return Date()
 		}
 		
@@ -125,8 +125,13 @@ public final class TimelineView: UIView {
 		}
 	}
 	
+	/// The timezone used for the current time indicator position.
+	/// Stored separately because `calendar.timeZone` is forced to UTC for layout.
+	public var displayTimeZone: TimeZone = TimeZone.current
+
 	public var calendar: Calendar = Calendar.autoupdatingCurrent {
 		didSet {
+			displayTimeZone = calendar.timeZone
 			calendar.timeZone = TimeZone(abbreviation: "UTC")!
 			eventEditingSnappingBehavior.calendar = calendar
 			nowLine.calendar = calendar
