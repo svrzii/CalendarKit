@@ -7,6 +7,8 @@ public final class Event: EventDescriptor {
   public var isAllDay = false
   public var text = ""
   public var attributedText: NSAttributedString?
+  public var subtitleAttributedText: NSAttributedString?
+  public var avatarImages: [UIImage]?
   public var lineBreakMode: NSLineBreakMode?
   public var color = SystemColors.systemBlue {
     didSet {
@@ -31,6 +33,8 @@ public final class Event: EventDescriptor {
     cloned.isAllDay = isAllDay
     cloned.text = text
     cloned.attributedText = attributedText
+    cloned.subtitleAttributedText = subtitleAttributedText
+    cloned.avatarImages = avatarImages
     cloned.lineBreakMode = lineBreakMode
     cloned.color = color
     cloned.backgroundColor = backgroundColor
