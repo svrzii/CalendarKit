@@ -230,7 +230,7 @@ open class EventView: UIView {
 			// NSAttributedString's own default font rather than subtitleLabel.font — measure the
 			// real single-line height instead of trusting the label's font property.
 			subtitleLabel.numberOfLines = 1
-			subtitleLineHeight = subtitleLabel.sizeThatFits(CGSize(width: .greatestFiniteMagnitude, height: .greatestFiniteMagnitude)).height
+			subtitleLineHeight = subtitleLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)).height
 
 			let maxLinesBySpace = Int((bounds.maxY - y - rowSpacing) / subtitleLineHeight)
 			subtitleLabel.numberOfLines = 0
