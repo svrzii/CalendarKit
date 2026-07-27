@@ -224,9 +224,15 @@ open class EventView: UIView {
 		let contentWidth = max(0, textView.frame.width - horizontalInset * 2)
 
 		let subtitleLineHeight = subtitleLabel.font.lineHeight
-		let availableForSubtitle = bounds.maxY - y - rowSpacing
-		let subtitleLines = min(maxSubtitleLines, Int(availableForSubtitle / subtitleLineHeight))
-		let showSubtitle = hasSubtitle && subtitleLines >= 1
+		var subtitleLines = 0
+		if hasSubtitle {
+			let maxLinesBySpace = Int((bounds.maxY - y - rowSpacing) / subtitleLineHeight)
+			subtitleLabel.numberOfLines = 0
+			let naturalHeight = subtitleLabel.sizeThatFits(CGSize(width: contentWidth, height: .greatestFiniteMagnitude)).height
+			let naturalLines = Int(ceil(naturalHeight / subtitleLineHeight))
+			subtitleLines = max(0, min(maxSubtitleLines, maxLinesBySpace, naturalLines))
+		}
+		let showSubtitle = subtitleLines >= 1
 		subtitleLabel.isHidden = !showSubtitle
 		if showSubtitle {
 			subtitleLabel.numberOfLines = subtitleLines
