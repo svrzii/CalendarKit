@@ -5,9 +5,9 @@ open class EventView: UIView {
   public var color = SystemColors.label
 
 	private let subtitleRowHeight: CGFloat = 16
-	private let avatarRowHeight: CGFloat = 16
-	private let avatarSize: CGFloat = 14
-	private let avatarOffset: CGFloat = 10
+	private let avatarRowHeight: CGFloat = 18
+	private let avatarSize: CGFloat = 16
+	private let avatarOffset: CGFloat = 12
 	private let rowSpacing: CGFloat = 2
 	private let horizontalInset: CGFloat = 4
 
