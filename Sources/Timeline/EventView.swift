@@ -4,7 +4,7 @@ open class EventView: UIView {
   public var descriptor: EventDescriptor?
   public var color = SystemColors.label
 
-	private let subtitleRowHeight: CGFloat = 13
+	private let maxSubtitleLines = 3
 	private let avatarRowHeight: CGFloat = 18
 	private let avatarSize: CGFloat = 16
 	private let avatarOffset: CGFloat = 12
@@ -27,7 +27,6 @@ open class EventView: UIView {
 	public private(set) lazy var subtitleLabel: UILabel = {
 		let label = UILabel()
 		label.isUserInteractionEnabled = false
-		label.numberOfLines = 1
 		label.lineBreakMode = .byTruncatingTail
 		label.font = .systemFont(ofSize: 11)
 		return label
@@ -224,12 +223,17 @@ open class EventView: UIView {
 		let contentX = textView.frame.minX + horizontalInset
 		let contentWidth = max(0, textView.frame.width - horizontalInset * 2)
 
-		let showSubtitle = hasSubtitle && bounds.maxY - y >= subtitleRowHeight + rowSpacing
+		let subtitleLineHeight = subtitleLabel.font.lineHeight
+		let availableForSubtitle = bounds.maxY - y - rowSpacing
+		let subtitleLines = min(maxSubtitleLines, Int(availableForSubtitle / subtitleLineHeight))
+		let showSubtitle = hasSubtitle && subtitleLines >= 1
 		subtitleLabel.isHidden = !showSubtitle
 		if showSubtitle {
+			subtitleLabel.numberOfLines = subtitleLines
 			y += rowSpacing
-			subtitleLabel.frame = CGRect(x: contentX, y: y, width: contentWidth, height: subtitleRowHeight)
-			y += subtitleRowHeight
+			let subtitleHeight = CGFloat(subtitleLines) * subtitleLineHeight
+			subtitleLabel.frame = CGRect(x: contentX, y: y, width: contentWidth, height: subtitleHeight)
+			y += subtitleHeight
 		}
 
 		let avatarCount = descriptor?.avatarImages?.count ?? 0
