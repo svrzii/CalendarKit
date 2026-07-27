@@ -4,6 +4,11 @@ open class EventView: UIView {
   public var descriptor: EventDescriptor?
   public var color = SystemColors.label
 
+	private let subtitleRowHeight: CGFloat = 14
+	private let avatarRowHeight: CGFloat = 16
+	private let avatarSize: CGFloat = 14
+	private let rowSpacing: CGFloat = 2
+
   public var contentHeight: CGFloat {
     textView.frame.height
   }
@@ -16,7 +21,25 @@ open class EventView: UIView {
 	view.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     return view
   }()
-	
+
+	public private(set) lazy var subtitleLabel: UILabel = {
+		let label = UILabel()
+		label.isUserInteractionEnabled = false
+		label.numberOfLines = 1
+		label.lineBreakMode = .byTruncatingTail
+		label.font = .systemFont(ofSize: 10)
+		return label
+	}()
+
+	public private(set) lazy var avatarsStackView: UIStackView = {
+		let stack = UIStackView()
+		stack.isUserInteractionEnabled = false
+		stack.axis = .horizontal
+		stack.alignment = .center
+		stack.spacing = 2
+		return stack
+	}()
+
 	public private(set) lazy var cardView: UIView = {
 		let view = UIView()
 		view.isUserInteractionEnabled = false
@@ -65,7 +88,9 @@ open class EventView: UIView {
     colorView.layer.masksToBounds = false
 	  
 	addSubview(textView)
-    
+	addSubview(subtitleLabel)
+	addSubview(avatarsStackView)
+
     for (idx, handle) in eventResizeHandles.enumerated() {
       handle.tag = idx
       addSubview(handle)
@@ -83,6 +108,19 @@ open class EventView: UIView {
     if let lineBreakMode = event.lineBreakMode {
       textView.textContainer.lineBreakMode = lineBreakMode
     }
+	subtitleLabel.attributedText = event.subtitleAttributedText
+
+	avatarsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+	for image in event.avatarImages ?? [] {
+		let imageView = UIImageView(image: image)
+		imageView.translatesAutoresizingMaskIntoConstraints = false
+		imageView.contentMode = .scaleAspectFill
+		imageView.layer.cornerRadius = avatarSize / 2
+		imageView.layer.masksToBounds = true
+		imageView.widthAnchor.constraint(equalToConstant: avatarSize).isActive = true
+		imageView.heightAnchor.constraint(equalToConstant: avatarSize).isActive = true
+		avatarsStackView.addArrangedSubview(imageView)
+	}
     descriptor = event
 	cardView.backgroundColor = event.cardBackgroundColor.withAlphaComponent(0.95)
 	colorView.backgroundColor = event.backgroundColor
@@ -151,6 +189,7 @@ open class EventView: UIView {
       textFrame.size.height += frame.minY;
       textView.frame = textFrame;
     }
+	layoutSubtitleAndAvatars()
     let first = eventResizeHandles.first
     let last = eventResizeHandles.last
     let radius: CGFloat = 40
@@ -168,6 +207,35 @@ open class EventView: UIView {
                         blur: 10)
     }
   }
+
+	private func layoutSubtitleAndAvatars() {
+		let hasSubtitle = descriptor?.subtitleAttributedText != nil
+		let hasAvatars = !(descriptor?.avatarImages?.isEmpty ?? true)
+
+		guard hasSubtitle || hasAvatars else {
+			subtitleLabel.isHidden = true
+			avatarsStackView.isHidden = true
+			return
+		}
+
+		let titleHeight = min(textView.sizeThatFits(CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)).height, textView.frame.height)
+		var y = textView.frame.minY + titleHeight
+
+		let showSubtitle = hasSubtitle && bounds.maxY - y >= subtitleRowHeight + rowSpacing
+		subtitleLabel.isHidden = !showSubtitle
+		if showSubtitle {
+			y += rowSpacing
+			subtitleLabel.frame = CGRect(x: textView.frame.minX, y: y, width: textView.frame.width, height: subtitleRowHeight)
+			y += subtitleRowHeight
+		}
+
+		let showAvatars = hasAvatars && bounds.width >= avatarSize + 4 && bounds.maxY - y >= avatarRowHeight + rowSpacing
+		avatarsStackView.isHidden = !showAvatars
+		if showAvatars {
+			y += rowSpacing
+			avatarsStackView.frame = CGRect(x: textView.frame.minX, y: y, width: textView.frame.width, height: avatarRowHeight)
+		}
+	}
 
   private func applySketchShadow(
     color: UIColor = .black,

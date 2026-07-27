@@ -6,6 +6,8 @@ public protocol EventDescriptor: AnyObject {
   var isAllDay: Bool {get}
   var text: String {get}
   var attributedText: NSAttributedString? {get}
+  var subtitleAttributedText: NSAttributedString? {get}
+  var avatarImages: [UIImage]? {get}
   var lineBreakMode: NSLineBreakMode? {get}
   var font : UIFont {get}
   var color: UIColor {get}
