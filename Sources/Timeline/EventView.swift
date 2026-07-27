@@ -7,7 +7,9 @@ open class EventView: UIView {
 	private let subtitleRowHeight: CGFloat = 14
 	private let avatarRowHeight: CGFloat = 16
 	private let avatarSize: CGFloat = 14
+	private let avatarOffset: CGFloat = 10
 	private let rowSpacing: CGFloat = 2
+	private let horizontalInset: CGFloat = 4
 
   public var contentHeight: CGFloat {
     textView.frame.height
@@ -31,13 +33,11 @@ open class EventView: UIView {
 		return label
 	}()
 
-	public private(set) lazy var avatarsStackView: UIStackView = {
-		let stack = UIStackView()
-		stack.isUserInteractionEnabled = false
-		stack.axis = .horizontal
-		stack.alignment = .center
-		stack.spacing = 2
-		return stack
+	public private(set) lazy var avatarsContainerView: UIView = {
+		let view = UIView()
+		view.isUserInteractionEnabled = false
+		view.clipsToBounds = true
+		return view
 	}()
 
 	public private(set) lazy var cardView: UIView = {
@@ -89,7 +89,7 @@ open class EventView: UIView {
 	  
 	addSubview(textView)
 	addSubview(subtitleLabel)
-	addSubview(avatarsStackView)
+	addSubview(avatarsContainerView)
 
     for (idx, handle) in eventResizeHandles.enumerated() {
       handle.tag = idx
@@ -110,16 +110,16 @@ open class EventView: UIView {
     }
 	subtitleLabel.attributedText = event.subtitleAttributedText
 
-	avatarsStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-	for image in event.avatarImages ?? [] {
+	avatarsContainerView.subviews.forEach { $0.removeFromSuperview() }
+	for (index, image) in (event.avatarImages ?? []).enumerated() {
 		let imageView = UIImageView(image: image)
-		imageView.translatesAutoresizingMaskIntoConstraints = false
 		imageView.contentMode = .scaleAspectFill
+		imageView.frame = CGRect(x: CGFloat(index) * avatarOffset, y: 0, width: avatarSize, height: avatarSize)
 		imageView.layer.cornerRadius = avatarSize / 2
 		imageView.layer.masksToBounds = true
-		imageView.widthAnchor.constraint(equalToConstant: avatarSize).isActive = true
-		imageView.heightAnchor.constraint(equalToConstant: avatarSize).isActive = true
-		avatarsStackView.addArrangedSubview(imageView)
+		imageView.layer.borderWidth = 1
+		imageView.layer.borderColor = event.cardBackgroundColor.cgColor
+		avatarsContainerView.insertSubview(imageView, at: index)
 	}
     descriptor = event
 	cardView.backgroundColor = event.cardBackgroundColor.withAlphaComponent(0.95)
@@ -214,26 +214,31 @@ open class EventView: UIView {
 
 		guard hasSubtitle || hasAvatars else {
 			subtitleLabel.isHidden = true
-			avatarsStackView.isHidden = true
+			avatarsContainerView.isHidden = true
 			return
 		}
 
 		let titleHeight = min(textView.sizeThatFits(CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)).height, textView.frame.height)
 		var y = textView.frame.minY + titleHeight
 
+		let contentX = textView.frame.minX + horizontalInset
+		let contentWidth = max(0, textView.frame.width - horizontalInset * 2)
+
 		let showSubtitle = hasSubtitle && bounds.maxY - y >= subtitleRowHeight + rowSpacing
 		subtitleLabel.isHidden = !showSubtitle
 		if showSubtitle {
 			y += rowSpacing
-			subtitleLabel.frame = CGRect(x: textView.frame.minX, y: y, width: textView.frame.width, height: subtitleRowHeight)
+			subtitleLabel.frame = CGRect(x: contentX, y: y, width: contentWidth, height: subtitleRowHeight)
 			y += subtitleRowHeight
 		}
 
-		let showAvatars = hasAvatars && bounds.width >= avatarSize + 4 && bounds.maxY - y >= avatarRowHeight + rowSpacing
-		avatarsStackView.isHidden = !showAvatars
+		let avatarCount = descriptor?.avatarImages?.count ?? 0
+		let avatarsNaturalWidth = avatarCount > 0 ? CGFloat(avatarCount - 1) * avatarOffset + avatarSize : 0
+		let showAvatars = hasAvatars && contentWidth >= avatarSize && bounds.maxY - y >= avatarRowHeight + rowSpacing
+		avatarsContainerView.isHidden = !showAvatars
 		if showAvatars {
 			y += rowSpacing
-			avatarsStackView.frame = CGRect(x: textView.frame.minX, y: y, width: textView.frame.width, height: avatarRowHeight)
+			avatarsContainerView.frame = CGRect(x: contentX, y: y, width: min(avatarsNaturalWidth, contentWidth), height: avatarRowHeight)
 		}
 	}
 
