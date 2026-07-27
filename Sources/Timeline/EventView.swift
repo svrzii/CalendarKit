@@ -223,13 +223,19 @@ open class EventView: UIView {
 		let contentX = textView.frame.minX + horizontalInset
 		let contentWidth = max(0, textView.frame.width - horizontalInset * 2)
 
-		let subtitleLineHeight = subtitleLabel.font.lineHeight
+		var subtitleLineHeight = subtitleLabel.font.lineHeight
 		var subtitleLines = 0
 		if hasSubtitle {
+			// subtitleAttributedText's runs don't carry a font attribute, so they render at
+			// NSAttributedString's own default font rather than subtitleLabel.font — measure the
+			// real single-line height instead of trusting the label's font property.
+			subtitleLabel.numberOfLines = 1
+			subtitleLineHeight = subtitleLabel.sizeThatFits(CGSize(width: .greatestFiniteMagnitude, height: .greatestFiniteMagnitude)).height
+
 			let maxLinesBySpace = Int((bounds.maxY - y - rowSpacing) / subtitleLineHeight)
 			subtitleLabel.numberOfLines = 0
 			let naturalHeight = subtitleLabel.sizeThatFits(CGSize(width: contentWidth, height: .greatestFiniteMagnitude)).height
-			let naturalLines = Int(ceil(naturalHeight / subtitleLineHeight))
+			let naturalLines = Int(round(naturalHeight / subtitleLineHeight))
 			subtitleLines = max(0, min(maxSubtitleLines, maxLinesBySpace, naturalLines))
 		}
 		let showSubtitle = subtitleLines >= 1
