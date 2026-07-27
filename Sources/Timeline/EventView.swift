@@ -8,7 +8,7 @@ open class EventView: UIView {
 	private let avatarRowHeight: CGFloat = 18
 	private let avatarSize: CGFloat = 16
 	private let avatarOffset: CGFloat = 12
-	private let rowSpacing: CGFloat = 2
+	private let rowSpacing: CGFloat = 1
 	private let horizontalInset: CGFloat = 4
 
   public var contentHeight: CGFloat {
