@@ -4,7 +4,7 @@ open class EventView: UIView {
   public var descriptor: EventDescriptor?
   public var color = SystemColors.label
 
-	private let subtitleRowHeight: CGFloat = 16
+	private let subtitleRowHeight: CGFloat = 13
 	private let avatarRowHeight: CGFloat = 18
 	private let avatarSize: CGFloat = 16
 	private let avatarOffset: CGFloat = 12
@@ -29,7 +29,7 @@ open class EventView: UIView {
 		label.isUserInteractionEnabled = false
 		label.numberOfLines = 1
 		label.lineBreakMode = .byTruncatingTail
-		label.font = .systemFont(ofSize: 12)
+		label.font = .systemFont(ofSize: 11)
 		return label
 	}()
 
