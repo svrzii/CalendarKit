@@ -27,8 +27,13 @@ public final class TimelineContainer: UIScrollView {
     } else {
       bottomSafeInset = 0
     }
-    scrollIndicatorInsets = UIEdgeInsets(top: allDayViewHeight, left: 0, bottom: bottomSafeInset, right: 0)
-    contentInset = UIEdgeInsets(top: allDayViewHeight, left: 0, bottom: bottomSafeInset, right: 0)
+    // Assigning contentInset schedules another layout pass, so only do it on an actual change -
+    // otherwise every scroll frame re-enters layoutSubviews.
+    let insets = UIEdgeInsets(top: allDayViewHeight, left: 0, bottom: bottomSafeInset, right: 0)
+    if contentInset != insets {
+      scrollIndicatorInsets = insets
+      contentInset = insets
+    }
   }
   
   public func prepareForReuse() {

@@ -12,6 +12,7 @@ public final class TimelineView: UIView {
 	
 	public var date = Date() {
 		didSet {
+			needsEventLayout = true
 			setNeedsLayout()
 		}
 	}
@@ -57,7 +58,7 @@ public final class TimelineView: UIView {
 			allDayLayoutAttributes.removeAll()
 			regularLayoutAttributes.removeAll()
 			sortedEvents.removeAll()
-			numberOfRecalculations = 0
+			needsEventLayout = true
 			for anEventLayoutAttribute in newValue {
 				let eventDescriptor = anEventLayoutAttribute.descriptor
 				if eventDescriptor.isAllDay {
@@ -136,6 +137,7 @@ public final class TimelineView: UIView {
 			eventEditingSnappingBehavior.calendar = calendar
 			nowLine.calendar = calendar
 			regenerateTimeStrings()
+			needsEventLayout = true
 			setNeedsLayout()
 		}
 	}
@@ -197,15 +199,19 @@ public final class TimelineView: UIView {
 		// Add long press gesture recognizer
 		addGestureRecognizer(longPressGestureRecognizer)
 		addGestureRecognizer(tapGestureRecognizer)
-		
-		// Scheduling timer to Call the function "updateCounting" with the interval of 1 seconds
-		timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateCounting), userInfo: nil, repeats: true)
+
+		// The now line moves at minute resolution, so repositioning it is the only thing that needs
+		// to happen on a clock. It must not drive the event layout: recalculating that on a timer
+		// rebuilt every event view mid-scroll.
+		nowLineTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+			self?.layoutNowLine()
+		}
 	}
-	
-	var allowRecalculation = false
-	@objc func updateCounting(){
-		self.allowRecalculation = true
+
+	deinit {
+		nowLineTimer?.invalidate()
 	}
+
 	// MARK: - Event Handling
 	
 	@objc private func longPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
@@ -282,6 +288,8 @@ public final class TimelineView: UIView {
 		}
 		
 		backgroundColor = style.backgroundColor
+		needsEventLayout = true
+		setNeedsLayout()
 		setNeedsDisplay()
 	}
 	
@@ -408,18 +416,20 @@ public final class TimelineView: UIView {
 	
 	// MARK: - Layout
 	
-	var timer = Timer()
-	var numberOfRecalculations = 0
+	private var nowLineTimer: Timer?
+	private var needsEventLayout = true
+	private var lastLaidOutSize: CGSize = .zero
 	override public func layoutSubviews() {
 		super.layoutSubviews()
-		if self.numberOfRecalculations < 1 || self.allowRecalculation {
-			recalculateEventLayout()
-			layoutEvents()
-			layoutNowLine()
-			layoutAllDayEvents()
-			self.allowRecalculation = false
-			self.numberOfRecalculations += 1
-		}
+		// This runs on every scroll frame (the scroll view offsets the all-day view through us), so
+		// the event layout is only redone when the events, the date or our size actually changed.
+		guard needsEventLayout || bounds.size != lastLaidOutSize else { return }
+		needsEventLayout = false
+		lastLaidOutSize = bounds.size
+		recalculateEventLayout()
+		layoutEvents()
+		layoutNowLine()
+		layoutAllDayEvents()
 	}
 	
 	private func layoutNowLine() {
