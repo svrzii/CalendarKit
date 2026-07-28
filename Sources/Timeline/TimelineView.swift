@@ -451,7 +451,7 @@ public final class TimelineView: UIView {
 	/// - Parameter event: the EventDescriptor based on which an EventView will be placed on the Timeline
 	/// - Parameter animated: if true, CalendarKit animates event creation
 	public func create(event: EventDescriptor, animated: Bool) {
-		let eventView = EventView()
+		let eventView = pool.dequeue()
 		addSubview(eventView)
 		eventView.updateWithDescriptor(event: event)
 		// layout algo
@@ -643,7 +643,7 @@ public final class TimelineView: UIView {
 		for eventView in eventViews {
 			eventView.removeFromSuperview()
 		}
-		//    pool.enqueue(views: eventViews)
+		pool.enqueue(views: eventViews)
 		self.eventViews.removeAll()
 		
 		for regular in regularLayoutAttributes {

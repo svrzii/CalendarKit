@@ -215,6 +215,10 @@ open class EventView: UIView {
     if drawsShadow {
       applySketchShadow(alpha: 0.13,
                         blur: 10)
+    } else {
+      // Views come back from the reuse pool, so a shadow left by a previously edited event has to
+      // be cleared rather than just not re-applied.
+      layer.shadowOpacity = 0
     }
   }
 
