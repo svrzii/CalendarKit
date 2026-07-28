@@ -243,7 +243,8 @@ public final class TimelineView: UIView {
 			}
 		}
 		
-		for eventView in eventViews.reversed() {
+		// `subviews` is the actual z-order, so the front-most overlapping event is found first.
+		for case let eventView as EventView in subviews.reversed() {
 			let frame = eventView.frame
 			if frame.contains(point) {
 				return eventView
@@ -505,7 +506,10 @@ public final class TimelineView: UIView {
 			eventView.updateWithDescriptor(event: descriptor)
 		}
 		
-		self.eventViews = self.eventViews.sorted(by: {
+		// Only the z-order is sorted here. `eventViews` must stay in `regularLayoutAttributes` order,
+		// which is the column order `prepareEventViews` created them in - reordering it made the
+		// loop above hand every view a different event's descriptor on the next layout pass.
+		let eventViewsInZOrder = self.eventViews.sorted(by: {
 			guard let eventInterval0 = $0.descriptor?.dateInterval, let eventInterval1 = $1.descriptor?.dateInterval else {
 				return false
 			}
@@ -520,7 +524,7 @@ public final class TimelineView: UIView {
 		})
 		
 		
-		for eventView in self.eventViews {
+		for eventView in eventViewsInZOrder {
 			bringSubviewToFront(eventView)
 		}
 	}
@@ -565,6 +569,9 @@ public final class TimelineView: UIView {
 	
 	func setupColumns(events: [EventLayoutAttributes]) {
 		self.eventColums.removeAll()
+		for event in events {
+			event.intersections.removeAll()
+		}
 		for event in events {
 			let position = self.findIntersections(newEvent: event)
 			if self.eventColums.indices.contains(position) {
