@@ -128,6 +128,10 @@ open class EventView: UIView {
 		imageView.layer.masksToBounds = true
 		imageView.layer.borderWidth = 1
 		imageView.layer.borderColor = cardBackgroundColor.cgColor
+		// Rounding a bordered image view is an offscreen pass; the avatar never changes size or
+		// content once set, so let Core Animation cache the composited result.
+		imageView.layer.shouldRasterize = true
+		imageView.layer.rasterizationScale = UIScreen.main.scale
 		avatarsContainerView.insertSubview(imageView, at: index)
 	}
     descriptor = event
@@ -184,6 +188,10 @@ open class EventView: UIView {
     super.layoutSubviews()
 	cardView.frame = CGRect(x: 0, y: 3, width: bounds.width, height: bounds.height - 3)
 	colorView.frame = bounds
+	// Without an explicit path Core Animation derives the shadow from the layer's alpha channel,
+	// which costs an offscreen pass per event on every frame. The shape is the layer's rounded rect.
+	colorView.layer.shadowPath = UIBezierPath(roundedRect: colorView.bounds,
+											  cornerRadius: colorView.layer.cornerRadius).cgPath
     textView.frame = {
         if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
             return CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width - 3, height: bounds.height)
