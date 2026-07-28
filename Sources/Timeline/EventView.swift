@@ -57,6 +57,12 @@ open class EventView: UIView {
   /// The top handle has a tag of `0` and the bottom has a tag of `1`
   public private(set) lazy var eventResizeHandles = [EventResizeHandleView(), EventResizeHandleView()]
 
+	/// Snapshot of the descriptor's subtitle/avatars taken in `updateWithDescriptor`.
+	/// `layoutSubviews` must not re-read the descriptor: those properties are computed on the
+	/// consumer side and can rasterize images or hit the store on every access.
+	private var subtitleText: NSAttributedString?
+	private var avatarCount = 0
+
   override public init(frame: CGRect) {
     super.init(frame: frame)
     configure()
@@ -107,31 +113,36 @@ open class EventView: UIView {
     if let lineBreakMode = event.lineBreakMode {
       textView.textContainer.lineBreakMode = lineBreakMode
     }
-	subtitleLabel.attributedText = event.subtitleAttributedText
+	subtitleText = event.subtitleAttributedText
+	subtitleLabel.attributedText = subtitleText
 
+	let cardBackgroundColor = event.cardBackgroundColor
+	let avatarImages = event.avatarImages ?? []
+	avatarCount = avatarImages.count
 	avatarsContainerView.subviews.forEach { $0.removeFromSuperview() }
-	for (index, image) in (event.avatarImages ?? []).enumerated() {
+	for (index, image) in avatarImages.enumerated() {
 		let imageView = UIImageView(image: image)
 		imageView.contentMode = .scaleAspectFill
 		imageView.frame = CGRect(x: CGFloat(index) * avatarOffset, y: 0, width: avatarSize, height: avatarSize)
 		imageView.layer.cornerRadius = avatarSize / 2
 		imageView.layer.masksToBounds = true
 		imageView.layer.borderWidth = 1
-		imageView.layer.borderColor = event.cardBackgroundColor.cgColor
+		imageView.layer.borderColor = cardBackgroundColor.cgColor
 		avatarsContainerView.insertSubview(imageView, at: index)
 	}
     descriptor = event
-	cardView.backgroundColor = event.cardBackgroundColor.withAlphaComponent(0.95)
+	cardView.backgroundColor = cardBackgroundColor.withAlphaComponent(0.95)
 	colorView.backgroundColor = event.backgroundColor
 	colorView.layer.shadowColor = event.shadowColor.cgColor
 
 	backgroundColor = .clear
     color = event.color
+	let isEdited = event.editedEvent != nil
     eventResizeHandles.forEach{
-      $0.borderColor =  event.color
-      $0.isHidden = event.editedEvent == nil
+      $0.borderColor =  color
+      $0.isHidden = !isEdited
     }
-    drawsShadow = event.editedEvent != nil
+    drawsShadow = isEdited
     setNeedsDisplay()
     setNeedsLayout()
   }
@@ -208,8 +219,8 @@ open class EventView: UIView {
   }
 
 	private func layoutSubtitleAndAvatars() {
-		let hasSubtitle = descriptor?.subtitleAttributedText != nil
-		let hasAvatars = !(descriptor?.avatarImages?.isEmpty ?? true)
+		let hasSubtitle = subtitleText != nil
+		let hasAvatars = avatarCount > 0
 
 		guard hasSubtitle || hasAvatars else {
 			subtitleLabel.isHidden = true
@@ -248,7 +259,6 @@ open class EventView: UIView {
 			y += subtitleHeight
 		}
 
-		let avatarCount = descriptor?.avatarImages?.count ?? 0
 		let avatarsNaturalWidth = avatarCount > 0 ? CGFloat(avatarCount - 1) * avatarOffset + avatarSize : 0
 		let showAvatars = hasAvatars && contentWidth >= avatarSize && bounds.maxY - y >= avatarRowHeight + rowSpacing
 		avatarsContainerView.isHidden = !showAvatars
