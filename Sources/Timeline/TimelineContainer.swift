@@ -51,7 +51,9 @@ public final class TimelineContainer: UIScrollView {
   public func scrollTo(hour24: Float, animated: Bool = true) {
     let percentToScroll = CGFloat(hour24 / 24)
     let yToScroll = contentSize.height * percentToScroll
-    let padding: CGFloat = 8
+    // The all-day view floats over the top of the visible area, so the target hour has to clear it
+    // or it - and the current time indicator sitting within that hour - ends up behind the header.
+    let padding = timeline.allDayViewHeight + 8
     setTimelineOffset(CGPoint(x: contentOffset.x, y: yToScroll - padding), animated: animated)
   }
 
