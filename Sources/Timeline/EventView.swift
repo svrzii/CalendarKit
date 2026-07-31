@@ -231,7 +231,7 @@ open class EventView: UIView {
   }
 
 	private func layoutSubtitleAndAvatars() {
-		let hasSubtitle = subtitleText != nil
+		let hasSubtitle = (subtitleText?.length ?? 0) > 0
 		let hasAvatars = avatarCount > 0
 
 		guard hasSubtitle || hasAvatars else {
@@ -255,11 +255,15 @@ open class EventView: UIView {
 			subtitleLabel.numberOfLines = 1
 			subtitleLineHeight = subtitleLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)).height
 
-			let maxLinesBySpace = Int((bounds.maxY - y - rowSpacing) / subtitleLineHeight)
-			subtitleLabel.numberOfLines = 0
-			let naturalHeight = subtitleLabel.sizeThatFits(CGSize(width: contentWidth, height: .greatestFiniteMagnitude)).height
-			let naturalLines = Int(round(naturalHeight / subtitleLineHeight))
-			subtitleLines = max(0, min(maxSubtitleLines, maxLinesBySpace, naturalLines))
+			// A measured height of 0 would make the line counts below infinite/NaN, which traps
+			// when converted to Int — treat it as nothing to draw instead.
+			if subtitleLineHeight > 0 {
+				let maxLinesBySpace = Int((bounds.maxY - y - rowSpacing) / subtitleLineHeight)
+				subtitleLabel.numberOfLines = 0
+				let naturalHeight = subtitleLabel.sizeThatFits(CGSize(width: contentWidth, height: .greatestFiniteMagnitude)).height
+				let naturalLines = Int(round(naturalHeight / subtitleLineHeight))
+				subtitleLines = max(0, min(maxSubtitleLines, maxLinesBySpace, naturalLines))
+			}
 		}
 		let showSubtitle = subtitleLines >= 1
 		subtitleLabel.isHidden = !showSubtitle
