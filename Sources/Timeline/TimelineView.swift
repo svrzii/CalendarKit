@@ -301,24 +301,12 @@ public final class TimelineView: UIView {
 	override public func draw(_ rect: CGRect) {
 		super.draw(rect)
 		
-		var hourToRemoveIndex = -1
-		
 		var accentedHour = -1
 		var accentedMinute = -1
 		
 		if let accentedDate = accentedDate {
 			accentedHour = eventEditingSnappingBehavior.accentedHour(for: accentedDate)
 			accentedMinute = eventEditingSnappingBehavior.accentedMinute(for: accentedDate)
-		}
-		
-		if isToday {
-			let minute = component(component: .minute, from: currentTime)
-			let hour = component(component: .hour, from: currentTime)
-			if minute > 39 {
-				hourToRemoveIndex = hour + 1
-			} else if minute < 21 {
-				hourToRemoveIndex = hour
-			}
 		}
 		
 		let mutableParagraphStyle = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
@@ -371,8 +359,6 @@ public final class TimelineView: UIView {
 			context?.addLine(to: CGPoint(x: xEnd, y: y))
 			context?.strokePath()
 			context?.restoreGState()
-			
-			if hour == hourToRemoveIndex { continue }
 			
 			let fontSize = style.font.pointSize
 			let timeRect: CGRect = {
