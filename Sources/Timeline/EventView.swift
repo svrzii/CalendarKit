@@ -213,6 +213,7 @@ open class EventView: UIView {
     descriptor = event
 	colorView.backgroundColor = event.backgroundColor
 	colorView.layer.borderColor = event.borderColor.cgColor
+	alpha = event.isEnded ? 0.5 : 1
 
 	backgroundColor = .clear
     color = event.color

@@ -25,6 +25,7 @@ public protocol EventDescriptor: AnyObject {
   var isChecked: Bool {get}
   var checkboxColor: UIColor {get}
   var borderColor: UIColor {get}
+  var isEnded: Bool {get}
 }
 
 public extension EventDescriptor {
@@ -35,4 +36,5 @@ public extension EventDescriptor {
   var isChecked: Bool { false }
   var checkboxColor: UIColor { color }
   var borderColor: UIColor { color.withAlphaComponent(0.22) }
+  var isEnded: Bool { false }
 }
