@@ -54,7 +54,7 @@ open class EventView: UIView {
 
 	private let avatarSize: CGFloat = 20
 	private let avatarOffset: CGFloat = 14
-	private let iconSize: CGFloat = 12
+	private let iconSize: CGFloat = 10
 	private let horizontalPadding: CGFloat = 9
 	private let iconTextGap: CGFloat = 6
 	private let rowSpacing: CGFloat = 2
