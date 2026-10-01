@@ -520,19 +520,15 @@ public final class TimelineView: UIView {
 			if eventInterval0.start < eventInterval1.start {
 				return true
 			} else if eventInterval0.start == eventInterval1.start {
-				return eventInterval0.end > eventInterval1.end
+				return eventInterval0.end < eventInterval1.end
 			} else {
 				return false
 			}
 		})
 		
 		
-		for (index, eventView) in eventViewsInZOrder.enumerated() {
+		for eventView in eventViewsInZOrder {
 			bringSubviewToFront(eventView)
-			eventView.isOnTop = eventViewsInZOrder[..<index].contains {
-				let overlap = $0.frame.intersection(eventView.frame)
-				return !overlap.isNull && overlap.width > 0.5 && overlap.height > 0.5
-			}
 		}
 	}
 	

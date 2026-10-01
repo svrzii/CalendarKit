@@ -45,16 +45,6 @@ open class EventView: UIView {
   public var color = SystemColors.label
   public var onCheckboxTap: (() -> Void)?
 
-  /// True when this event is drawn over another one; only then does the bubble cast a shadow.
-  public var isOnTop = false {
-    didSet {
-      setNeedsLayout()
-    }
-  }
-
-  private let farShadowLayer = CALayer()
-  private let nearShadowLayer = CALayer()
-
 	private let avatarSize: CGFloat = 20
 	private let avatarOffset: CGFloat = 14
 	private let iconSize: CGFloat = 14
@@ -144,21 +134,10 @@ open class EventView: UIView {
 	layer.cornerRadius = 10
     color = tintColor
 
-	[farShadowLayer, nearShadowLayer].forEach {
-		$0.shadowColor = UIColor(red: 28 / 255, green: 29 / 255, blue: 41 / 255, alpha: 1).cgColor
-		$0.isHidden = true
-		layer.insertSublayer($0, at: 0)
-	}
-	farShadowLayer.shadowOffset = CGSize(width: 0, height: 4)
-	farShadowLayer.shadowRadius = 6
-	farShadowLayer.shadowOpacity = 0.16
-	nearShadowLayer.shadowOffset = CGSize(width: 0, height: 1)
-	nearShadowLayer.shadowRadius = 1.5
-	nearShadowLayer.shadowOpacity = 0.10
-
 	colorView.frame = bounds
 	colorView.layer.cornerRadius = 10
 	colorView.layer.borderWidth = 1
+	colorView.layer.borderColor = UIColor(red: 28 / 255, green: 29 / 255, blue: 41 / 255, alpha: 0.04).cgColor
 	colorView.clipsToBounds = true
 	insertSubview(colorView, at: 0)
 
@@ -222,7 +201,6 @@ open class EventView: UIView {
 	iconView.isHidden = event.showsCheckbox || event.icon == nil
     descriptor = event
 	colorView.backgroundColor = event.backgroundColor
-	colorView.layer.borderColor = event.borderColor.cgColor
 
 	backgroundColor = .clear
     color = event.color
@@ -272,15 +250,6 @@ open class EventView: UIView {
   override open func layoutSubviews() {
     super.layoutSubviews()
 	colorView.frame = bounds
-	CATransaction.begin()
-	CATransaction.setDisableActions(true)
-	let shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: colorView.layer.cornerRadius).cgPath
-	[farShadowLayer, nearShadowLayer].forEach {
-		$0.frame = bounds
-		$0.shadowPath = shadowPath
-		$0.isHidden = !isOnTop
-	}
-	CATransaction.commit()
 	layoutContent()
     let first = eventResizeHandles.first
     let last = eventResizeHandles.last
