@@ -42,6 +42,10 @@ final class EventCheckboxView: UIControl {
   func configure(color: UIColor, isChecked: Bool) {
     layer.borderColor = color.cgColor
     backgroundColor = isChecked ? color : .white
+    var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+    color.resolvedColor(with: traitCollection).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+    let luminance = 0.299 * red + 0.587 * green + 0.114 * blue
+    checkLayer.strokeColor = (luminance > 0.6 ? UIColor(red: 0x1C / 255, green: 0x1D / 255, blue: 0x29 / 255, alpha: 1) : UIColor.white).cgColor
     checkLayer.isHidden = !isChecked
   }
 }
@@ -204,6 +208,7 @@ open class EventView: UIView {
 	checkboxView.configure(color: event.checkboxColor, isChecked: event.isChecked)
 	checkboxView.isHidden = !event.showsCheckbox
 	iconView.image = event.icon
+	iconView.tintColor = event.checkboxColor
 	iconView.isHidden = event.showsCheckbox || event.icon == nil
     descriptor = event
 	colorView.backgroundColor = event.backgroundColor
