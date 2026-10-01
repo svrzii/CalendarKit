@@ -51,16 +51,6 @@ open class EventView: UIView {
   public var color = SystemColors.label
   public var onCheckboxTap: (() -> Void)?
 
-  private let ringLayer = CALayer()
-  private let ringMask = CAShapeLayer()
-
-  /// Frames, in this view's coordinates, of the events drawn below this one. The outer ring is
-  /// only painted over their interiors so it never cuts through another bubble's border.
-  var underlyingFrames: [CGRect] = [] {
-    didSet {
-      setNeedsLayout()
-    }
-  }
 
 	private let avatarSize: CGFloat = 20
 	private let avatarOffset: CGFloat = 14
@@ -151,15 +141,11 @@ open class EventView: UIView {
 	layer.cornerRadius = 10
     color = tintColor
 
-	ringLayer.cornerRadius = 12
-	ringLayer.mask = ringMask
-
 	colorView.frame = bounds
 	colorView.layer.cornerRadius = 10
-	colorView.layer.borderWidth = 1
+	colorView.layer.borderWidth = 1.5
 	colorView.clipsToBounds = true
 	insertSubview(colorView, at: 0)
-	layer.insertSublayer(ringLayer, below: colorView.layer)
 
 	checkboxView.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
 
@@ -222,7 +208,6 @@ open class EventView: UIView {
     descriptor = event
 	colorView.backgroundColor = event.backgroundColor
 	colorView.layer.borderColor = event.borderColor.cgColor
-	ringLayer.backgroundColor = ringColor.cgColor
 
 	backgroundColor = .clear
     color = event.color
@@ -272,16 +257,6 @@ open class EventView: UIView {
   override open func layoutSubviews() {
     super.layoutSubviews()
 	colorView.frame = bounds
-	CATransaction.begin()
-	CATransaction.setDisableActions(true)
-	ringLayer.frame = bounds.insetBy(dx: -2, dy: -2)
-	ringMask.frame = ringLayer.bounds
-	let ringPath = UIBezierPath()
-	for frame in underlyingFrames {
-		ringPath.append(UIBezierPath(roundedRect: frame.insetBy(dx: 1, dy: 1).offsetBy(dx: 2, dy: 2), cornerRadius: 9))
-	}
-	ringMask.path = ringPath.cgPath
-	CATransaction.commit()
 	layoutContent()
     let first = eventResizeHandles.first
     let last = eventResizeHandles.last
