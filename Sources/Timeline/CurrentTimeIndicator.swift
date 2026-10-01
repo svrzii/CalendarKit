@@ -9,10 +9,15 @@ import UIKit
   /// Determines if times should be displayed in a 24 hour format. Defaults to the current locale's setting
   public var is24hClock : Bool = true
 
-  public var date = Date()
+  public var date = Date() {
+    didSet {
+      updateTimeText()
+    }
+  }
 
   private var circle = UIView()
   private var line = UIView()
+  private let timeLabel = UILabel()
 
   private var style = CurrentTimeIndicatorStyle()
 
@@ -27,9 +32,10 @@ import UIKit
   }
 
   private func configure() {
-    [circle, line].forEach {
+    [circle, line, timeLabel].forEach {
       addSubview($0)
     }
+    timeLabel.textAlignment = .right
 
     updateStyle(style)
     isUserInteractionEnabled = false
@@ -37,6 +43,11 @@ import UIKit
 
   override public func layoutSubviews() {
     super.layoutSubviews()
+    if style.showsTimeLabel {
+      layoutWithTimeLabel()
+      return
+    }
+    timeLabel.isHidden = true
     line.frame = {
         
         let x: CGFloat
@@ -65,10 +76,34 @@ import UIKit
     circle.layer.cornerRadius = circle.bounds.height / 2
   }
 
+  private func layoutWithTimeLabel() {
+    let dotLeading = style.labelWidth + 6
+    timeLabel.isHidden = false
+    timeLabel.frame = CGRect(x: 0, y: (bounds.height - 16) / 2, width: style.labelWidth, height: 16)
+    circle.frame = CGRect(x: dotLeading, y: 0, width: style.dotSize, height: style.dotSize)
+    circle.center.y = bounds.height / 2
+    circle.layer.cornerRadius = style.dotSize / 2
+    line.frame = CGRect(x: dotLeading + style.dotSize / 2, y: (bounds.height - style.lineHeight) / 2, width: bounds.width - dotLeading - style.dotSize / 2, height: style.lineHeight)
+  }
+
+  private func updateTimeText() {
+    guard style.showsTimeLabel else {
+      return
+    }
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.timeZone = TimeZone(abbreviation: "UTC")
+    formatter.dateFormat = is24hClock ? "HH:mm" : "h:mm a"
+    timeLabel.text = formatter.string(from: date)
+  }
+
   func updateStyle(_ newStyle: CurrentTimeIndicatorStyle) {
     style = newStyle
     circle.backgroundColor = style.color
     line.backgroundColor = style.color
+    timeLabel.font = style.font
+    timeLabel.textColor = style.color
+    timeLabel.backgroundColor = style.labelBackgroundColor
     
     switch style.dateStyle {
     case .twelveHour:
@@ -81,5 +116,7 @@ import UIKit
         is24hClock = Locale.autoupdatingCurrent.uses24hClock()
         break
     }
+    updateTimeText()
+    setNeedsLayout()
   }
 }
