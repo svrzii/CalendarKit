@@ -527,12 +527,8 @@ public final class TimelineView: UIView {
 		})
 		
 		
-		for (index, eventView) in eventViewsInZOrder.enumerated() {
+		for eventView in eventViewsInZOrder {
 			bringSubviewToFront(eventView)
-			let ringArea = eventView.frame.insetBy(dx: -2, dy: -2)
-			eventView.underlyingFrames = eventViewsInZOrder[..<index]
-				.filter { $0.frame.intersects(ringArea) }
-				.map { $0.frame.offsetBy(dx: -eventView.frame.minX, dy: -eventView.frame.minY) }
 		}
 	}
 	
