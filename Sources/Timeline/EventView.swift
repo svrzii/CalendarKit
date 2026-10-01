@@ -27,12 +27,6 @@ final class EventCheckboxView: UIControl {
   override func layoutSubviews() {
     super.layoutSubviews()
     checkLayer.frame = bounds
-    let scale = bounds.width / 14
-    let path = UIBezierPath()
-    path.move(to: CGPoint(x: 3.5 * scale, y: 7.2 * scale))
-    path.addLine(to: CGPoint(x: 6 * scale, y: 9.7 * scale))
-    path.addLine(to: CGPoint(x: 10.5 * scale, y: 4.8 * scale))
-    checkLayer.path = path.cgPath
   }
 
   override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
@@ -51,11 +45,19 @@ open class EventView: UIView {
   public var color = SystemColors.label
   public var onCheckboxTap: (() -> Void)?
 
-  private let ringLayer = CALayer()
+  /// True when this event is drawn over another one; only then does the bubble cast a shadow.
+  public var isOnTop = false {
+    didSet {
+      setNeedsLayout()
+    }
+  }
+
+  private let farShadowLayer = CALayer()
+  private let nearShadowLayer = CALayer()
 
 	private let avatarSize: CGFloat = 20
 	private let avatarOffset: CGFloat = 14
-	private let iconSize: CGFloat = 12
+	private let iconSize: CGFloat = 14
 	private let horizontalPadding: CGFloat = 9
 	private let iconTextGap: CGFloat = 6
 	private let rowSpacing: CGFloat = 2
@@ -79,8 +81,8 @@ open class EventView: UIView {
 	public private(set) lazy var timeLabel: UILabel = {
 		let label = UILabel()
 		label.isUserInteractionEnabled = false
-		label.font = .systemFont(ofSize: 11)
-		label.textColor = UIColor(red: 0x4E / 255, green: 0x55 / 255, blue: 0x70 / 255, alpha: 1)
+		label.font = .systemFont(ofSize: 12, weight: .bold)
+		label.textColor = UIColor(red: 0x4B / 255, green: 0x4F / 255, blue: 0x62 / 255, alpha: 1)
 		return label
 	}()
 
@@ -142,14 +144,25 @@ open class EventView: UIView {
 	layer.cornerRadius = 10
     color = tintColor
 
-	ringLayer.cornerRadius = 12
+	[farShadowLayer, nearShadowLayer].forEach {
+		$0.shadowColor = UIColor(red: 28 / 255, green: 29 / 255, blue: 41 / 255, alpha: 1).cgColor
+		$0.isHidden = true
+	}
+	farShadowLayer.shadowOffset = CGSize(width: 0, height: 4)
+	farShadowLayer.shadowRadius = 6
+	farShadowLayer.shadowOpacity = 0.16
+	nearShadowLayer.shadowOffset = CGSize(width: 0, height: 1)
+	nearShadowLayer.shadowRadius = 1.5
+	nearShadowLayer.shadowOpacity = 0.10
 
 	colorView.frame = bounds
 	colorView.layer.cornerRadius = 10
 	colorView.layer.borderWidth = 1
 	colorView.clipsToBounds = true
 	insertSubview(colorView, at: 0)
-	layer.insertSublayer(ringLayer, below: colorView.layer)
+	[nearShadowLayer, farShadowLayer].forEach {
+		layer.insertSublayer($0, below: colorView.layer)
+	}
 
 	checkboxView.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
 
@@ -212,7 +225,6 @@ open class EventView: UIView {
     descriptor = event
 	colorView.backgroundColor = event.backgroundColor
 	colorView.layer.borderColor = event.borderColor.cgColor
-	ringLayer.backgroundColor = ringColor.cgColor
 
 	backgroundColor = .clear
     color = event.color
@@ -264,7 +276,12 @@ open class EventView: UIView {
 	colorView.frame = bounds
 	CATransaction.begin()
 	CATransaction.setDisableActions(true)
-	ringLayer.frame = bounds.insetBy(dx: -2, dy: -2)
+	let shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: colorView.layer.cornerRadius).cgPath
+	[farShadowLayer, nearShadowLayer].forEach {
+		$0.frame = bounds
+		$0.shadowPath = shadowPath
+		$0.isHidden = !isOnTop
+	}
 	CATransaction.commit()
 	layoutContent()
     let first = eventResizeHandles.first
