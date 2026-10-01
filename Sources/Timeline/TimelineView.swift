@@ -5,11 +5,6 @@ public protocol TimelineViewDelegate: AnyObject {
 	func timelineView(_ timelineView: TimelineView, didLongPressAt date: Date)
 	func timelineView(_ timelineView: TimelineView, didTap event: EventView)
 	func timelineView(_ timelineView: TimelineView, didLongPress event: EventView)
-	func timelineView(_ timelineView: TimelineView, didTapCheckbox event: EventView)
-}
-
-public extension TimelineViewDelegate {
-	func timelineView(_ timelineView: TimelineView, didTapCheckbox event: EventView) {}
 }
 
 public final class TimelineView: UIView {
@@ -122,7 +117,7 @@ public final class TimelineView: UIView {
 	}
 	
 	public var calendarWidth: CGFloat {
-		bounds.width - style.leadingInset - style.eventTrailingInset
+		bounds.width - style.leadingInset
 	}
 	
 	public private(set) var is24hClock = true {
@@ -195,6 +190,8 @@ public final class TimelineView: UIView {
 	}
 	
 	private func configure() {
+		contentScaleFactor = 1
+		layer.contentsScale = 1
 		contentMode = .redraw
 		backgroundColor = .white
 		addSubview(nowLine)
@@ -322,7 +319,7 @@ public final class TimelineView: UIView {
 						  NSAttributedString.Key.font: style.font] as [NSAttributedString.Key : Any]
 		
 		let scale = UIScreen.main.scale
-		let hourLineHeight = style.hourLineWidth ?? 1 / UIScreen.main.scale
+		let hourLineHeight = 1 / UIScreen.main.scale
 		
 		let center: CGFloat
 		if Int(scale) % 2 == 0 {
@@ -346,7 +343,7 @@ public final class TimelineView: UIView {
 				if rightToLeft {
 					return bounds.width - 53
 				} else {
-					return style.hourLineLeading
+					return 53
 				}
 			}()
 			let xEnd: CGFloat = {
@@ -361,14 +358,6 @@ public final class TimelineView: UIView {
 			context?.move(to: CGPoint(x: xStart, y: y))
 			context?.addLine(to: CGPoint(x: xEnd, y: y))
 			context?.strokePath()
-			if let halfHourLineColor = style.halfHourLineColor, hour < times.count - 1 {
-				let halfY = y + style.verticalDiff / 2
-				context?.setStrokeColor(halfHourLineColor.cgColor)
-				context?.beginPath()
-				context?.move(to: CGPoint(x: rightToLeft ? bounds.width - style.leadingInset : style.leadingInset, y: halfY))
-				context?.addLine(to: CGPoint(x: xEnd, y: halfY))
-				context?.strokePath()
-			}
 			context?.restoreGState()
 			
 			let fontSize = style.font.pointSize
@@ -377,12 +366,12 @@ public final class TimelineView: UIView {
 				if rightToLeft {
 					x = bounds.width - 53
 				} else {
-					x = style.hourLabelWidth == nil ? 2 : 0
+					x = 2
 				}
 				
 				return CGRect(x: x,
 							  y: hourFloat * style.verticalDiff + style.verticalInset - 7,
-							  width: style.hourLabelWidth ?? style.leadingInset - 8,
+							  width: style.leadingInset - 8,
 							  height: fontSize + 2)
 			}()
 			
@@ -450,12 +439,6 @@ public final class TimelineView: UIView {
 	public func create(event: EventDescriptor, animated: Bool) {
 		let eventView = pool.dequeue()
 		addSubview(eventView)
-		eventView.onCheckboxTap = { [weak self, weak eventView] in
-			guard let self = self, let eventView = eventView else {
-				return
-			}
-			self.delegate?.timelineView(self, didTapCheckbox: eventView)
-		}
 		eventView.updateWithDescriptor(event: event)
 		// layout algo
 		

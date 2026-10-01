@@ -73,11 +73,6 @@ public struct TimelineStyle {
   public var verticalInset: CGFloat = 10
   public var leadingInset: CGFloat = 53
   public var eventGap: CGFloat = 0
-  public var eventTrailingInset: CGFloat = 0
-  public var hourLabelWidth: CGFloat?
-  public var hourLineLeading: CGFloat = 53
-  public var hourLineWidth: CGFloat?
-  public var halfHourLineColor: UIColor?
   public init() {}
 }
 
@@ -85,11 +80,6 @@ public struct CurrentTimeIndicatorStyle {
   public var color = SystemColors.systemRed
   public var font = UIFont.systemFont(ofSize: 11)
   public var dateStyle : DateStyle = .system
-  public var showsTimeLabel = false
-  public var labelWidth: CGFloat = 46
-  public var labelBackgroundColor = SystemColors.systemBackground
-  public var dotSize: CGFloat = 6
-  public var lineHeight: CGFloat = 1
   public init() {}
 }
 

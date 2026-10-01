@@ -18,19 +18,4 @@ public protocol EventDescriptor: AnyObject {
   var editedEvent: EventDescriptor? {get set}
   func makeEditable() -> Self
   func commitEditing()
-  var icon: UIImage? {get}
-  var timeText: String? {get}
-  var startTimeText: String? {get}
-  var showsCheckbox: Bool {get}
-  var isChecked: Bool {get}
-  var checkboxColor: UIColor {get}
-}
-
-public extension EventDescriptor {
-  var icon: UIImage? { nil }
-  var timeText: String? { nil }
-  var startTimeText: String? { nil }
-  var showsCheckbox: Bool { false }
-  var isChecked: Bool { false }
-  var checkboxColor: UIColor { color }
 }

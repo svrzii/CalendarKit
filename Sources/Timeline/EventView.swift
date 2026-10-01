@@ -1,56 +1,15 @@
 import UIKit
 
-final class EventCheckboxView: UIControl {
-  private let checkLayer = CAShapeLayer()
-
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-    layer.cornerRadius = 4
-    layer.borderWidth = 1.5
-    checkLayer.fillColor = nil
-    checkLayer.strokeColor = UIColor.white.cgColor
-    checkLayer.lineWidth = 1.6
-    checkLayer.lineCap = .round
-    checkLayer.lineJoin = .round
-    let path = UIBezierPath()
-    path.move(to: CGPoint(x: 3.5, y: 7.2))
-    path.addLine(to: CGPoint(x: 6, y: 9.7))
-    path.addLine(to: CGPoint(x: 10.5, y: 4.8))
-    checkLayer.path = path.cgPath
-    layer.addSublayer(checkLayer)
-  }
-
-  required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
-  }
-
-  override func layoutSubviews() {
-    super.layoutSubviews()
-    checkLayer.frame = bounds
-  }
-
-  override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-    return bounds.insetBy(dx: -12, dy: -12).contains(point)
-  }
-
-  func configure(color: UIColor, isChecked: Bool) {
-    layer.borderColor = color.cgColor
-    backgroundColor = isChecked ? color : .white
-    checkLayer.isHidden = !isChecked
-  }
-}
-
 open class EventView: UIView {
   public var descriptor: EventDescriptor?
   public var color = SystemColors.label
-  public var onCheckboxTap: (() -> Void)?
 
-	private let avatarSize: CGFloat = 20
-	private let avatarOffset: CGFloat = 14
-	private let iconSize: CGFloat = 14
-	private let horizontalPadding: CGFloat = 9
-	private let iconTextGap: CGFloat = 6
-	private let rowSpacing: CGFloat = 2
+	private let maxSubtitleLines = 3
+	private let avatarRowHeight: CGFloat = 18
+	private let avatarSize: CGFloat = 16
+	private let avatarOffset: CGFloat = 12
+	private let rowSpacing: CGFloat = 1
+	private let horizontalInset: CGFloat = 4
 
   public var contentHeight: CGFloat {
     textView.frame.height
@@ -62,26 +21,14 @@ open class EventView: UIView {
     view.backgroundColor = .clear
     view.isScrollEnabled = false
 	view.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-	view.textContainer.lineFragmentPadding = 0
-	view.textContainer.maximumNumberOfLines = 1
-	view.textContainer.lineBreakMode = .byTruncatingTail
     return view
   }()
-
-	public private(set) lazy var timeLabel: UILabel = {
-		let label = UILabel()
-		label.isUserInteractionEnabled = false
-		label.font = .systemFont(ofSize: 12, weight: .bold)
-		label.textColor = UIColor(red: 0x4B / 255, green: 0x4F / 255, blue: 0x62 / 255, alpha: 1)
-		return label
-	}()
 
 	public private(set) lazy var subtitleLabel: UILabel = {
 		let label = UILabel()
 		label.isUserInteractionEnabled = false
 		label.lineBreakMode = .byTruncatingTail
-		label.numberOfLines = 1
-		label.font = .systemFont(ofSize: 12)
+		label.font = .systemFont(ofSize: 11)
 		return label
 	}()
 
@@ -92,15 +39,13 @@ open class EventView: UIView {
 		return view
 	}()
 
-	public private(set) lazy var iconView: UIImageView = {
-		let view = UIImageView()
+	public private(set) lazy var cardView: UIView = {
+		let view = UIView()
 		view.isUserInteractionEnabled = false
-		view.contentMode = .scaleAspectFit
+		view.backgroundColor = .white
 		return view
 	}()
-
-	let checkboxView = EventCheckboxView()
-
+	
 	public private(set) lazy var colorView: UIView = {
 		let view = UIView()
 		view.isUserInteractionEnabled = false
@@ -112,12 +57,10 @@ open class EventView: UIView {
   /// The top handle has a tag of `0` and the bottom has a tag of `1`
   public private(set) lazy var eventResizeHandles = [EventResizeHandleView(), EventResizeHandleView()]
 
-	/// Snapshot of the descriptor's subtitle/time/avatars taken in `updateWithDescriptor`.
+	/// Snapshot of the descriptor's subtitle/avatars taken in `updateWithDescriptor`.
 	/// `layoutSubviews` must not re-read the descriptor: those properties are computed on the
 	/// consumer side and can rasterize images or hit the store on every access.
 	private var subtitleText: NSAttributedString?
-	private var fullTimeText: String?
-	private var startTimeText: String?
 	private var avatarCount = 0
 
   override public init(frame: CGRect) {
@@ -131,22 +74,25 @@ open class EventView: UIView {
   }
 
   private func configure() {
-	layer.cornerRadius = 10
+	layer.cornerRadius = 5
     color = tintColor
-
+	  
+	cardView.frame = CGRect(x: 0, y: 2, width: bounds.width, height: bounds.height - 2)
 	colorView.frame = bounds
-	colorView.layer.cornerRadius = 10
-	colorView.layer.borderWidth = 1
-	colorView.layer.borderColor = UIColor(red: 28 / 255, green: 29 / 255, blue: 41 / 255, alpha: 0.04).cgColor
+	colorView.layer.cornerRadius = 5
 	colorView.clipsToBounds = true
 	insertSubview(colorView, at: 0)
 
-	checkboxView.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
-
-	addSubview(iconView)
-	addSubview(checkboxView)
+	cardView.layer.cornerRadius = 4
+	insertSubview(cardView, at: 1)
+	  
+    colorView.layer.shadowColor = UIColor.black.cgColor
+    colorView.layer.shadowOffset = CGSize(width: 0.0, height: 0.5)
+    colorView.layer.shadowRadius = 5
+    colorView.layer.shadowOpacity = 0.5
+    colorView.layer.masksToBounds = false
+	  
 	addSubview(textView)
-	addSubview(timeLabel)
 	addSubview(subtitleLabel)
 	addSubview(avatarsContainerView)
 
@@ -154,10 +100,6 @@ open class EventView: UIView {
       handle.tag = idx
       addSubview(handle)
     }
-  }
-
-  @objc private func checkboxTapped() {
-    onCheckboxTap?()
   }
 
   public func updateWithDescriptor(event: EventDescriptor) {
@@ -173,10 +115,8 @@ open class EventView: UIView {
     }
 	subtitleText = event.subtitleAttributedText
 	subtitleLabel.attributedText = subtitleText
-	fullTimeText = event.timeText
-	startTimeText = event.startTimeText
 
-	let ringColor = event.cardBackgroundColor
+	let cardBackgroundColor = event.cardBackgroundColor
 	let avatarImages = event.avatarImages ?? []
 	avatarCount = avatarImages.count
 	avatarsContainerView.subviews.forEach { $0.removeFromSuperview() }
@@ -186,21 +126,18 @@ open class EventView: UIView {
 		imageView.frame = CGRect(x: CGFloat(index) * avatarOffset, y: 0, width: avatarSize, height: avatarSize)
 		imageView.layer.cornerRadius = avatarSize / 2
 		imageView.layer.masksToBounds = true
-		imageView.layer.borderWidth = 1.5
-		imageView.layer.borderColor = ringColor.cgColor
+		imageView.layer.borderWidth = 1
+		imageView.layer.borderColor = cardBackgroundColor.cgColor
 		// Rounding a bordered image view is an offscreen pass; the avatar never changes size or
 		// content once set, so let Core Animation cache the composited result.
 		imageView.layer.shouldRasterize = true
 		imageView.layer.rasterizationScale = UIScreen.main.scale
 		avatarsContainerView.insertSubview(imageView, at: index)
 	}
-
-	checkboxView.configure(color: event.checkboxColor, isChecked: event.isChecked)
-	checkboxView.isHidden = !event.showsCheckbox
-	iconView.image = event.icon
-	iconView.isHidden = event.showsCheckbox || event.icon == nil
     descriptor = event
+	cardView.backgroundColor = cardBackgroundColor.withAlphaComponent(0.95)
 	colorView.backgroundColor = event.backgroundColor
+	colorView.layer.shadowColor = event.shadowColor.cgColor
 
 	backgroundColor = .clear
     color = event.color
@@ -249,8 +186,28 @@ open class EventView: UIView {
 
   override open func layoutSubviews() {
     super.layoutSubviews()
+	cardView.frame = CGRect(x: 0, y: 3, width: bounds.width, height: bounds.height - 3)
 	colorView.frame = bounds
-	layoutContent()
+	// Without an explicit path Core Animation derives the shadow from the layer's alpha channel,
+	// which costs an offscreen pass per event on every frame. The shape is the layer's rounded rect.
+	colorView.layer.shadowPath = UIBezierPath(roundedRect: colorView.bounds,
+											  cornerRadius: colorView.layer.cornerRadius).cgPath
+    textView.frame = {
+        if UIView.userInterfaceLayoutDirection(for: semanticContentAttribute) == .rightToLeft {
+            return CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width - 3, height: bounds.height)
+        } else {
+			let textViewY = bounds.height >= 24 ? bounds.minY + 5 : bounds.minY + 1
+			
+			return CGRect(x: bounds.minX, y: textViewY, width: bounds.width, height: bounds.height - textViewY * 2)
+        }
+    }()
+    if frame.minY < 0 {
+      var textFrame = textView.frame;
+      textFrame.origin.y = frame.minY * -1;
+      textFrame.size.height += frame.minY;
+      textView.frame = textFrame;
+    }
+	layoutSubtitleAndAvatars()
     let first = eventResizeHandles.first
     let last = eventResizeHandles.last
     let radius: CGFloat = 40
@@ -273,68 +230,57 @@ open class EventView: UIView {
     }
   }
 
-	private func layoutContent() {
-		let isShort = bounds.height < 40
-		let top: CGFloat = (isShort ? 5 : 7) + max(0, -frame.minY)
-		let hasLeading = !iconView.isHidden || !checkboxView.isHidden
-		let textX = horizontalPadding + (hasLeading ? iconSize + iconTextGap : 0)
+	private func layoutSubtitleAndAvatars() {
+		let hasSubtitle = (subtitleText?.length ?? 0) > 0
+		let hasAvatars = avatarCount > 0
 
-		var timeWidth: CGFloat = 0
-		if isShort, let startTimeText = startTimeText, !startTimeText.isEmpty {
-			timeLabel.text = startTimeText
-			timeWidth = ceil(timeLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)).width)
-		}
-
-		let textWidth = max(1, bounds.width - textX - horizontalPadding - (timeWidth > 0 ? timeWidth + iconTextGap : 0))
-		let lineHeight = ceil(textView.sizeThatFits(CGSize(width: textWidth, height: CGFloat.greatestFiniteMagnitude)).height)
-		textView.frame = CGRect(x: textX, y: top, width: textWidth, height: lineHeight)
-
-		let iconFrame = CGRect(x: horizontalPadding, y: top + (lineHeight - iconSize) / 2, width: iconSize, height: iconSize)
-		iconView.frame = iconFrame
-		checkboxView.frame = iconFrame
-
-		var y = top + lineHeight
-		let bottomLimit = bounds.height - 5
-
-		if isShort {
-			timeLabel.isHidden = timeWidth == 0
-			timeLabel.frame = CGRect(x: bounds.width - horizontalPadding - timeWidth, y: top + (lineHeight - timeLabel.font.lineHeight) / 2, width: timeWidth, height: ceil(timeLabel.font.lineHeight))
+		guard hasSubtitle || hasAvatars else {
 			subtitleLabel.isHidden = true
 			avatarsContainerView.isHidden = true
 			return
 		}
 
-		let contentWidth = max(0, bounds.width - horizontalPadding * 2)
+		let titleHeight = min(textView.sizeThatFits(CGSize(width: textView.bounds.width, height: .greatestFiniteMagnitude)).height, textView.frame.height)
+		var y = textView.frame.minY + titleHeight
 
-		timeLabel.text = fullTimeText
-		let timeHeight = ceil(timeLabel.font.lineHeight)
-		let showTime = !(fullTimeText ?? "").isEmpty && y + rowSpacing + timeHeight <= bottomLimit
-		timeLabel.isHidden = !showTime
-		if showTime {
-			y += rowSpacing
-			timeLabel.frame = CGRect(x: horizontalPadding, y: y, width: contentWidth, height: timeHeight)
-			y += timeHeight
+		let contentX = textView.frame.minX + horizontalInset
+		let contentWidth = max(0, textView.frame.width - horizontalInset * 2)
+
+		var subtitleLineHeight = subtitleLabel.font.lineHeight
+		var subtitleLines = 0
+		if hasSubtitle {
+			// subtitleAttributedText's runs don't carry a font attribute, so they render at
+			// NSAttributedString's own default font rather than subtitleLabel.font — measure the
+			// real single-line height instead of trusting the label's font property.
+			subtitleLabel.numberOfLines = 1
+			subtitleLineHeight = subtitleLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)).height
+
+			// A measured height of 0 would make the line counts below infinite/NaN, which traps
+			// when converted to Int — treat it as nothing to draw instead.
+			if subtitleLineHeight > 0 {
+				let maxLinesBySpace = Int((bounds.maxY - y - rowSpacing) / subtitleLineHeight)
+				subtitleLabel.numberOfLines = 0
+				let naturalHeight = subtitleLabel.sizeThatFits(CGSize(width: contentWidth, height: .greatestFiniteMagnitude)).height
+				let naturalLines = Int(round(naturalHeight / subtitleLineHeight))
+				subtitleLines = max(0, min(maxSubtitleLines, maxLinesBySpace, naturalLines))
+			}
 		}
-
-		// subtitleAttributedText's runs don't carry a font attribute, so they render at
-		// NSAttributedString's own default font rather than subtitleLabel.font; measure the
-		// real single-line height instead of trusting the label's font property.
-		let hasSubtitle = (subtitleText?.length ?? 0) > 0
-		let subtitleHeight = hasSubtitle ? ceil(subtitleLabel.sizeThatFits(CGSize(width: contentWidth, height: CGFloat.greatestFiniteMagnitude)).height) : 0
-		let showSubtitle = hasSubtitle && subtitleHeight > 0 && y + rowSpacing + subtitleHeight <= bottomLimit
+		let showSubtitle = subtitleLines >= 1
 		subtitleLabel.isHidden = !showSubtitle
 		if showSubtitle {
+			subtitleLabel.numberOfLines = subtitleLines
 			y += rowSpacing
-			subtitleLabel.frame = CGRect(x: horizontalPadding, y: y, width: contentWidth, height: subtitleHeight)
+			let subtitleHeight = CGFloat(subtitleLines) * subtitleLineHeight
+			subtitleLabel.frame = CGRect(x: contentX, y: y, width: contentWidth, height: subtitleHeight)
 			y += subtitleHeight
 		}
 
 		let avatarsNaturalWidth = avatarCount > 0 ? CGFloat(avatarCount - 1) * avatarOffset + avatarSize : 0
-		let showAvatars = avatarCount > 0 && contentWidth >= avatarSize && y + rowSpacing + avatarSize <= bottomLimit
+		let showAvatars = hasAvatars && contentWidth >= avatarSize && bounds.maxY - y >= avatarRowHeight + rowSpacing
 		avatarsContainerView.isHidden = !showAvatars
 		if showAvatars {
-			y += rowSpacing + 1
-			avatarsContainerView.frame = CGRect(x: horizontalPadding, y: y, width: min(avatarsNaturalWidth, contentWidth), height: avatarSize)
+			y += rowSpacing
+			avatarsContainerView.frame = CGRect(x: contentX, y: y, width: min(avatarsNaturalWidth, contentWidth), height: avatarRowHeight)
 		}
 	}
 
