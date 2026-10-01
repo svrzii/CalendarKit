@@ -136,8 +136,7 @@ open class EventView: UIView {
 
 	colorView.frame = bounds
 	colorView.layer.cornerRadius = 10
-	colorView.layer.borderWidth = 1
-	colorView.layer.borderColor = UIColor(red: 28 / 255, green: 29 / 255, blue: 41 / 255, alpha: 0.04).cgColor
+	colorView.layer.borderWidth = 1.5
 	colorView.clipsToBounds = true
 	insertSubview(colorView, at: 0)
 
@@ -201,6 +200,7 @@ open class EventView: UIView {
 	iconView.isHidden = event.showsCheckbox || event.icon == nil
     descriptor = event
 	colorView.backgroundColor = event.backgroundColor
+	colorView.layer.borderColor = ringColor.cgColor
 
 	backgroundColor = .clear
     color = event.color
