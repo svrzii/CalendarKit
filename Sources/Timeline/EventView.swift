@@ -59,6 +59,8 @@ open class EventView: UIView {
 	private let avatarSize: CGFloat = 20
 	private let avatarOffset: CGFloat = 14
 	private let iconSize: CGFloat = 10
+	private let ringWidth: CGFloat = 1.5
+	private let ringLayer = CALayer()
 	private let horizontalPadding: CGFloat = 9
 	private let iconTextGap: CGFloat = 6
 	private let rowSpacing: CGFloat = 2
@@ -147,9 +149,10 @@ open class EventView: UIView {
 
 	colorView.frame = bounds
 	colorView.layer.cornerRadius = 10
-	colorView.layer.borderWidth = 1.5
 	colorView.clipsToBounds = true
 	insertSubview(colorView, at: 0)
+	ringLayer.cornerRadius = 10 + ringWidth
+	layer.insertSublayer(ringLayer, below: colorView.layer)
 
 	checkboxView.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
 
@@ -212,7 +215,7 @@ open class EventView: UIView {
 	iconView.isHidden = event.showsCheckbox || event.icon == nil
     descriptor = event
 	colorView.backgroundColor = event.backgroundColor
-	colorView.layer.borderColor = event.borderColor.cgColor
+	ringLayer.backgroundColor = event.borderColor.cgColor
 	alpha = event.isEnded ? 0.5 : 1
 
 	backgroundColor = .clear
@@ -263,6 +266,10 @@ open class EventView: UIView {
   override open func layoutSubviews() {
     super.layoutSubviews()
 	colorView.frame = bounds
+	CATransaction.begin()
+	CATransaction.setDisableActions(true)
+	ringLayer.frame = bounds.insetBy(dx: -ringWidth, dy: -ringWidth)
+	CATransaction.commit()
 	layoutContent()
     let first = eventResizeHandles.first
     let last = eventResizeHandles.last
