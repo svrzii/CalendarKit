@@ -147,6 +147,7 @@ open class EventView: UIView {
 	[farShadowLayer, nearShadowLayer].forEach {
 		$0.shadowColor = UIColor(red: 28 / 255, green: 29 / 255, blue: 41 / 255, alpha: 1).cgColor
 		$0.isHidden = true
+		layer.insertSublayer($0, at: 0)
 	}
 	farShadowLayer.shadowOffset = CGSize(width: 0, height: 4)
 	farShadowLayer.shadowRadius = 6
@@ -160,9 +161,6 @@ open class EventView: UIView {
 	colorView.layer.borderWidth = 1
 	colorView.clipsToBounds = true
 	insertSubview(colorView, at: 0)
-	[nearShadowLayer, farShadowLayer].forEach {
-		layer.insertSublayer($0, below: colorView.layer)
-	}
 
 	checkboxView.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
 
