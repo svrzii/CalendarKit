@@ -214,9 +214,10 @@ open class EventView: UIView {
 	iconView.tintColor = event.checkboxColor
 	iconView.isHidden = event.showsCheckbox || event.icon == nil
     descriptor = event
-	colorView.backgroundColor = event.backgroundColor
+	colorView.backgroundColor = event.isEnded ? EventView.faded(event.backgroundColor) : event.backgroundColor
 	ringLayer.backgroundColor = event.borderColor.cgColor
-	alpha = event.isEnded ? 0.5 : 1
+	alpha = 1
+	subviews.filter { $0 !== colorView }.forEach { $0.alpha = event.isEnded ? 0.5 : 1 }
 
 	backgroundColor = .clear
     color = event.color
@@ -262,6 +263,16 @@ open class EventView: UIView {
   }
 
   private var drawsShadow = false
+
+	private static func faded(_ color: UIColor) -> UIColor {
+		return UIColor { traits in
+			var base: (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+			var page: (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+			color.resolvedColor(with: traits).getRed(&base.0, green: &base.1, blue: &base.2, alpha: &base.3)
+			UIColor.systemBackground.resolvedColor(with: traits).getRed(&page.0, green: &page.1, blue: &page.2, alpha: &page.3)
+			return UIColor(red: (base.0 + page.0) / 2, green: (base.1 + page.1) / 2, blue: (base.2 + page.2) / 2, alpha: 1)
+		}
+	}
 
   override open func layoutSubviews() {
     super.layoutSubviews()
