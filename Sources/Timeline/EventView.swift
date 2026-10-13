@@ -149,6 +149,7 @@ open class EventView: UIView {
 
 	colorView.frame = bounds
 	colorView.layer.cornerRadius = 10
+	colorView.layer.borderWidth = 1
 	colorView.clipsToBounds = true
 	insertSubview(colorView, at: 0)
 	ringLayer.cornerRadius = 10 + ringWidth
@@ -215,7 +216,7 @@ open class EventView: UIView {
 	iconView.isHidden = event.showsCheckbox || event.icon == nil
     descriptor = event
 	colorView.backgroundColor = event.isEnded ? EventView.faded(event.backgroundColor) : event.backgroundColor
-	ringLayer.backgroundColor = event.borderColor.cgColor
+	resolveEdgeColors()
 	alpha = 1
 	subviews.filter { $0 !== colorView }.forEach { $0.alpha = event.isEnded ? 0.5 : 1 }
 
@@ -271,6 +272,20 @@ open class EventView: UIView {
 			color.resolvedColor(with: traits).getRed(&base.0, green: &base.1, blue: &base.2, alpha: &base.3)
 			UIColor.systemBackground.resolvedColor(with: traits).getRed(&page.0, green: &page.1, blue: &page.2, alpha: &page.3)
 			return UIColor(red: (base.0 + page.0) / 2, green: (base.1 + page.1) / 2, blue: (base.2 + page.2) / 2, alpha: 1)
+		}
+	}
+
+	private func resolveEdgeColors() {
+		guard let event = descriptor else { return }
+		let edge = event.isEnded ? EventView.faded(event.edgeColor) : event.edgeColor
+		colorView.layer.borderColor = edge.resolvedColor(with: traitCollection).cgColor
+		ringLayer.backgroundColor = event.borderColor.resolvedColor(with: traitCollection).cgColor
+	}
+
+	override open func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+		super.traitCollectionDidChange(previousTraitCollection)
+		if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+			resolveEdgeColors()
 		}
 	}
 
